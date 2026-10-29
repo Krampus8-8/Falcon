@@ -23,6 +23,11 @@ while True:
     print("13 - Begin13 [СЛОЖНОЕ] (Площадь кольца)")
     print("14 - Begin14 [СЛОЖНОЕ] (Радиус и площадь по длине окружности)")
     print("15 - Begin15 [СЛОЖНОЕ] (Диаметр и длина окружности по площади)")
+    print("16 - Begin16 (Расстояние между точками на оси)")
+    print("17 - Begin17 (Отрезки AC, BC и их сумма)")
+    print("18 - Begin18 [СЛОЖНОЕ] (Произведение отрезков AC и BC)")
+    print("19 - Begin19 [СЛОЖНОЕ] (Периметр и площадь прямоугольника по вершинам)")
+    print("20 - Begin20 [СЛОЖНОЕ] (Расстояние между точками на плоскости)")
     print("0  - Выход")
     print("=" * 60)
 
@@ -157,6 +162,53 @@ while True:
         length = 2 * PI * radius
         print("Диаметр D =", diameter)
         print("Длина окружности L =", length)
+
+    elif choice == "16":
+        # Begin16. Расстояние между точками x1 и x2 на числовой оси: |x2 - x1|.
+        x1 = float(input("x1: "))
+        x2 = float(input("x2: "))
+        distance = abs(x2 - x1)
+        print("Расстояние =", distance)
+
+    elif choice == "17":
+        # Begin17. Точки A, B, C на оси. Найти длины AC, BC и их сумму.
+        a = float(input("Точка A: "))
+        b = float(input("Точка B: "))
+        c = float(input("Точка C: "))
+        ac = abs(c - a)
+        bc = abs(c - b)
+        print("AC =", ac)
+        print("BC =", bc)
+        print("Сумма AC + BC =", ac + bc)
+
+    elif choice == "18":
+        # Begin18. Точка C между A и B. Найти произведение длин AC и BC.
+        a = float(input("Точка A: "))
+        b = float(input("Точка B: "))
+        c = float(input("Точка C (между A и B): "))
+        ac = abs(c - a)
+        bc = abs(b - c)
+        print("AC * BC =", ac * bc)
+
+    elif choice == "19":
+        # Begin19. Противоположные вершины (x1, y1) и (x2, y2). Найти периметр и площадь.
+        x1 = float(input("x1: "))
+        y1 = float(input("y1: "))
+        x2 = float(input("x2: "))
+        y2 = float(input("y2: "))
+        width = abs(x2 - x1)
+        height = abs(y2 - y1)
+        print("Периметр =", 2 * (width + height))
+        print("Площадь =", width * height)
+
+    elif choice == "20":
+        # Begin20. Расстояние между (x1, y1) и (x2, y2): √((x2 - x1)² + (y2 - y1)²).
+        x1 = float(input("x1: "))
+        y1 = float(input("y1: "))
+        x2 = float(input("x2: "))
+        y2 = float(input("y2: "))
+        distance = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+        print("Расстояние =", distance)
 
     else:
         print("Неверный ввод! Выберите номер из списка.")
