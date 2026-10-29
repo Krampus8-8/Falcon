@@ -89,12 +89,32 @@ inventory = {}
 prices = {"bandage": 10, "lamp_oil": 15, "pickaxe": 40}
 ability_bonus = 0
 
+# --- Карта шахты ----------------------------------
+# "#" - стена, "." - штрек, "S" - клеть, в которой спустился герой.
+# Рамка из стен обязательна: на неё опирается рекурсия scout,
+# поэтому под клетью добавлен ещё один ряд стен.
+MAP = [
+    ["#", "#", "#", "#", "#"],
+    ["#", ".", ".", "#", "#"],
+    ["#", ".", "#", ".", "#"],
+    ["#", ".", ".", ".", "#"],
+    ["#", "#", "S", ".", "#"],
+    ["#", "#", "#", "#", "#"],
+]
+hero_r, hero_c = 4, 2
+visited = {(4, 2)}
+LOOT = {(1, 1): "старая каска", (2, 3): "кусок золотой руды", (3, 3): "фонарь бригадира"}
+found_loot = set()
+DIRECTIONS = {"north": (-1, 0), "south": (1, 0), "west": (0, -1), "east": (0, 1)}
+DIR_NAMES = {"north": "север", "south": "юг", "west": "запад", "east": "восток"}
+
 # --- Команды и меню -------------------------------
 num_to_verb = {"1": "look", "2": "go", "3": "rest", "4": "knock",
                "5": "lamp", "6": "train", "7": "descend", "8": "leaders",
-               "9": "shop", "10": "backpack", "11": "bandage", "0": "exit"}
-commands = ["look", "go", "rest", "knock", "lamp", "train", "descend",
-            "leaders", "shop", "backpack", "bandage",
+               "9": "shop", "10": "backpack", "11": "bandage", "12": "map",
+               "13": "scout", "0": "exit"}
+commands = ["look", "go", "go north/south/west/east", "rest", "knock", "lamp", "train", "descend",
+            "leaders", "shop", "backpack", "bandage", "map", "scout",
             "buy <товар> [количество]", "help", "exit"]
 MENU = ["Что делаешь? (номер или команда, help - справка)",
         "1 - осмотреться (look)",
@@ -108,6 +128,8 @@ MENU = ["Что делаешь? (номер или команда, help - спр
         "9 - лавка старого шахтёра (shop)",
         "10 - рюкзак (backpack)",
         "11 - перевязать раны (bandage)",
+        "12 - карта шахты (map)",
+        "13 - разведать штреки (scout)",
         "0 - подняться на поверхность (exit)"]
 
 
@@ -198,6 +220,20 @@ def print_run_summary(log):
         print("В этом забеге боёв не было.")
 
 
+def scout(r, c, seen):
+    """Рекурсивно считает комнаты, достижимые из клетки (r, c).
+    seen - множество уже посчитанных клеток, общее на весь обход.
+    Возвращает число комнат. Ничего не печатает.
+    """
+    if (r, c) in seen or MAP[r][c] == "#":
+        return 0
+    seen.add((r, c))
+    total = 1
+    for dr, dc in DIRECTIONS.values():
+        total += scout(r + dr, c + dc, seen)
+    return total
+
+
 # --- Главный цикл игры ----------------------------
 running = True
 outcome = "прерывание"
@@ -224,14 +260,29 @@ try:
                 print("Ты осмотрелся. Ржавые рельсы уходят в темноту, рядом стоит перевёрнутая вагонетка.")
 
             case "go":
-                cost = 2
-                if lamp_oil >= cost:
-                    lamp_oil -= cost
-                    print("Ты идёшь вперёд по рельсам. Под ногами хрустит уголь, лампа коптит.")
+                if len(words) > 1 and words[1] in DIRECTIONS:
+                    dr, dc = DIRECTIONS[words[1]]
+                    nr, nc = hero_r + dr, hero_c + dc
+                    if 0 <= nr < len(MAP) and 0 <= nc < len(MAP[nr]) and MAP[nr][nc] != "#":
+                        hero_r, hero_c = nr, nc
+                        visited.add((hero_r, hero_c))
+                        print(f"Ты идёшь на {DIR_NAMES[words[1]]}. Штрек ({hero_r}, {hero_c}).")
+                        if (hero_r, hero_c) in LOOT:
+                            item = LOOT[(hero_r, hero_c)]
+                            if item not in found_loot:
+                                found_loot.add(item)
+                                print(f"Ты нашёл: {item}! Уникальных находок: {len(found_loot)}.")
+                    else:
+                        print(f"Нельзя пройти на {DIR_NAMES[words[1]]}: там стена.")
                 else:
-                    health -= (cost - lamp_oil) * 10
-                    lamp_oil = 0
-                    print("Лампа погасла. Ты идёшь на ощупь и ударяешься о балки.")
+                    cost = 2
+                    if lamp_oil >= cost:
+                        lamp_oil -= cost
+                        print("Ты идёшь вперёд по рельсам. Под ногами хрустит уголь, лампа коптит.")
+                    else:
+                        health -= (cost - lamp_oil) * 10
+                        lamp_oil = 0
+                        print("Лампа погасла. Ты идёшь на ощупь и ударяешься о балки.")
 
             case "rest":
                 # отдых даёт меньше, чем забирает дорога, и не больше полного запаса
@@ -348,9 +399,23 @@ try:
                         del inventory["bandage"]
                     print(f"Ты перевязал раны. Здоровье: {health}. Бинтов осталось: {inventory.get('bandage', 0)}.")
 
+            case "map":
+                print("Карта шахты (@ - ты):")
+                for i in range(len(MAP)):
+                    cells = []
+                    for j in range(len(MAP[i])):
+                        cell = "@" if (i, j) == (hero_r, hero_c) else MAP[i][j]
+                        cells.append(cell)
+                    print(" ".join(cells))
+                print(f"Посещено штреков: {len(visited)}.")
+
+            case "scout":
+                seen = set()
+                print(f"Разведка: можно дойти до {scout(hero_r, hero_c, seen)} штреков.")
+
             case "help":
                 print("Команды: " + ", ".join(commands) + ".")
-                print("Номера 0-11 работают как раньше.")
+                print("Номера 0-13 работают как раньше.")
 
             case "exit":
                 print("Ты поднимаешься по лестнице к солнцу. Шахта остаётся внизу.")
