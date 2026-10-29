@@ -77,6 +77,18 @@ print()
 enemies = ["крыса-мутант", "шахтёр-призрак", "угольный голем", "летучая мышь"]
 log = []
 
+
+# --- Функции игры ---------------------------------
+def hero_hit(strike_n):
+    """Урон героя в удар номер strike_n.
+    Возвращает пару (hit, crit): урон и признак критического удара.
+    Читает глобальные правила damage и crit_damage, ничего не меняет.
+    """
+    if strike_n % 3 == 0:
+        return crit_damage, True
+    return damage, False
+
+
 running = True
 menu_last = 8
 outcome = "прерывание"
@@ -148,12 +160,11 @@ try:
                 print()
                 print(f"Наносишь {strikes} ударов.")
                 for i in range(1, strikes + 1):
-                    if i % 3 == 0:
-                        hit_damage = crit_damage
-                        print(f"Удар {i}: {hit_damage:.1f} - критический!")
+                    hit_damage, crit = hero_hit(i)
+                    if crit:
                         crit_count += 1
+                        print(f"Удар {i}: {hit_damage:.1f} - критический!")
                     else:
-                        hit_damage = damage
                         print(f"Удар {i}: {hit_damage:.1f}")
                     total_damage += hit_damage
                 # тренировка тяжелее дороги, поэтому забирает больше масла
