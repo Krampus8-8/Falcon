@@ -30,11 +30,13 @@ while True:
     print("4  - Matrix4  (Каждая строка - исходный набор)")
     print("7  - Matrix7  (K-я строка матрицы)")
     print("8  - Matrix8  (K-й столбец матрицы)")
+    print("9  - Matrix9  (Строки с чётными номерами)")
     print("--- Делаем сами ---")
     print("2  - Matrix2  (Столбец J заполнен числом 5*J)")
     print("3  - Matrix3  (Каждый столбец - исходный набор)")
     print("5  - Matrix5  [СЛОЖНОЕ] (Столбцы с шагом D)")
     print("6  - Matrix6  [СЛОЖНОЕ] (Строки с множителем Q)")
+    print("10 - Matrix10 (Столбцы с нечётными номерами)")
     print("0  - Выход")
     print("=" * 60)
 
@@ -115,6 +117,20 @@ while True:
         m, n, matrix = read_matrix()
         k = int(input("K (номер столбца): "))
         print([row[k - 1] for row in matrix])
+
+    elif choice == "9":
+        # Matrix9. Строки с чётными номерами, без условного оператора.
+        m, n, matrix = read_matrix()
+        for row in matrix[1::2]:
+            print(row)
+
+    elif choice == "10":
+        # Matrix10. Столбцы с нечётными номерами по столбцам, без условного оператора.
+        m, n, matrix = read_matrix()
+        for j in range(0, n, 2):
+            for row in matrix:
+                print(row[j], end=" ")
+            print()
 
     else:
         print("Неверный ввод! Выберите номер из списка.")
