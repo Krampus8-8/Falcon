@@ -39,36 +39,57 @@ print("   " + title + "   ")
 print(frame)
 print()
 
-# --- Знакомство с героем --------------------------
-print("Как зовут героя?")
-hero_name = input()
-print(f"Добро пожаловать, {hero_name}!")
-print("Ты спускаешься в старую шахту. Со стен сыплется угольная пыль, где-то капает вода.")
-print()
+# --- Сохранение: продолжить или начать заново -----
+loaded = None
+if os.path.exists("save.json"):
+    print("Найдено сохранение. Продолжить забег? (да/нет)")
+    answer = input().strip().lower()
+    if answer in ("да", "yes"):
+        try:
+            with open("save.json", encoding="utf-8") as f:
+                loaded = json.load(f)
+        except json.JSONDecodeError:
+            print("Файл сохранения испорчен, начинаем новый забег.")
+            loaded = None
 
-# --- Настройка героя -------------------------------
-print("Настройка героя.")
-print("Здоровье, сила, ловкость, удача - по одному числу в строке:")
-# если хоть одно число неверное, перечитываем все четыре:
-# половине набора доверять нельзя, порядок мог сбиться
-while True:
-    try:
-        health = int(input())
-        strength = int(input())
-        agility = int(input())
-        luck = int(input())
-        if health < 10 or health > 200:
-            raise ValueError(f"Здоровье должно быть от 10 до 200, а введено {health}")
-        if strength < 1 or agility < 1:
-            raise ValueError("Сила и ловкость должны быть не меньше 1")
-        if luck < 0 or luck > 10:
-            raise ValueError(f"Удача бывает от 0 до 10, а введено {luck}")
-        break
-    except ValueError as e:
-        if "invalid literal" in str(e):
-            print("Это не число. Шахтёр так не считает! Введи все четыре числа заново:")
-        else:
-            print(f"{e}. Введи все четыре числа заново:")
+if loaded is None:
+    # --- Знакомство с героем --------------------------
+    print("Как зовут героя?")
+    hero_name = input()
+    print(f"Добро пожаловать, {hero_name}!")
+    print("Ты спускаешься в старую шахту. Со стен сыплется угольная пыль, где-то капает вода.")
+    print()
+
+    # --- Настройка героя -------------------------------
+    print("Настройка героя.")
+    print("Здоровье, сила, ловкость, удача - по одному числу в строке:")
+    # если хоть одно число неверное, перечитываем все четыре:
+    # половине набора доверять нельзя, порядок мог сбиться
+    while True:
+        try:
+            health = int(input())
+            strength = int(input())
+            agility = int(input())
+            luck = int(input())
+            if health < 10 or health > 200:
+                raise ValueError(f"Здоровье должно быть от 10 до 200, а введено {health}")
+            if strength < 1 or agility < 1:
+                raise ValueError("Сила и ловкость должны быть не меньше 1")
+            if luck < 0 or luck > 10:
+                raise ValueError(f"Удача бывает от 0 до 10, а введено {luck}")
+            break
+        except ValueError as e:
+            if "invalid literal" in str(e):
+                print("Это не число. Шахтёр так не считает! Введи все четыре числа заново:")
+            else:
+                print(f"{e}. Введи все четыре числа заново:")
+
+else:
+    hero_name = loaded["hero"]
+    health = loaded["health"]
+    strength = loaded["strength"]
+    agility = loaded["agility"]
+    luck = loaded["luck"]
 
 # --- Расчёт урона ----------------------------------
 base_attack = 10
@@ -80,17 +101,18 @@ lamp_oil = (health + luck * 10) // 25
 max_oil = lamp_oil
 max_health = health
 
-# --- Формуляр героя --------------------------------
-print("Характеристики героя:")
-print(f"Здоровье: {health}")
-print(f"Сила:     {strength}")
-print(f"Ловкость: {agility}")
-print(f"Удача:    {luck}")
-print()
-print(f"Урон героя: {damage:.1f}")
-print(f"Критический урон: {crit_damage:.1f}")
-print(f"Масло в лампе: {lamp_oil}")
-print()
+if loaded is None:
+    # --- Формуляр героя --------------------------------
+    print("Характеристики героя:")
+    print(f"Здоровье: {health}")
+    print(f"Сила:     {strength}")
+    print(f"Ловкость: {agility}")
+    print(f"Удача:    {luck}")
+    print()
+    print(f"Урон героя: {damage:.1f}")
+    print(f"Критический урон: {crit_damage:.1f}")
+    print(f"Масло в лампе: {lamp_oil}")
+    print()
 
 # --- Враги, журнал боя и рюкзак -------------------
 # цены лавки и карточки врагов живут в dungeon.py
@@ -218,6 +240,24 @@ def scout(r, c, seen):
 running = True
 outcome = "прерывание"
 actions = 0
+
+# --- Восстановление забега из сохранения ----------
+if loaded is not None:
+    lamp_oil = loaded["lamp_oil"]
+    max_oil = loaded["max_oil"]
+    max_health = loaded["max_health"]
+    gold_total = loaded["gold"]
+    ability_bonus = loaded["bonus"]
+    actions = loaded["actions"]
+    enemies = loaded["enemies"]
+    inventory = loaded["inventory"]
+    log = loaded["log"]
+    hero_r, hero_c = loaded["position"]
+    visited = {tuple(p) for p in loaded["visited"]}
+    found_loot = set(loaded["loot"])
+    print(f"Забег продолжен, {hero_name}: здоровье {health}, золото {gold_total}, врагов осталось {len(enemies)}.")
+    print()
+
 try:
     while running:
         print("\n".join(MENU))
