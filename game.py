@@ -76,6 +76,8 @@ print()
 # --- Враги и журнал боя ---------------------------
 enemies = ["крыса-мутант", "шахтёр-призрак", "угольный голем", "летучая мышь"]
 log = []
+gold_total = 0
+ability_bonus = 0
 
 
 # --- Функции игры ---------------------------------
@@ -89,12 +91,13 @@ def hero_hit(strike_n):
     return damage, False
 
 
-def fight(enemy, hero_health):
+def fight(enemy, hero_health, bonus=0):
     """Бой с enemy до гибели одного из двоих.
-    Печатает строки раундов. Возвращает (rounds, won, hero_health):
-    таблицу раундов, признак победы героя и здоровье после боя.
-    Глобальные переменные не меняет: здоровье приходит параметром
-    и возвращается новым значением.
+    bonus - надбавка к урону героя, по умолчанию 0. Прибавляется
+    после удвоения критом, то есть крит не удваивает надбавку.
+    Печатает строки раундов. Возвращает (rounds, won, hero_health, loot):
+    таблицу раундов, признак победы, здоровье после боя и золото.
+    Глобальные переменные не меняет.
     """
     enemy_hp = 45.0
     rounds = []
@@ -103,6 +106,7 @@ def fight(enemy, hero_health):
     while enemy_hp > 0 and hero_health > 0:
         round_n += 1
         hit, crit = hero_hit(round_n)
+        hit = hit + bonus
         enemy_hp -= hit
         line = f"Раунд {round_n}: ты наносишь {hit:.1f}"
         if crit:
@@ -116,7 +120,12 @@ def fight(enemy, hero_health):
             line += f". У врага осталось {enemy_hp:.1f}. Ответный удар: {enemy_hit}."
             rounds.append([round_n, hit, enemy_hit])
         print(line)
-    return rounds, enemy_hp <= 0, hero_health
+    won = enemy_hp <= 0
+    if won:
+        loot = 10 + 5 * round_n
+    else:
+        loot = 0
+    return rounds, won, hero_health, loot
 
 
 def print_leaderboard(log):
@@ -242,12 +251,14 @@ try:
                     print("Ты спускаешься ниже, но шахта пуста: врагов больше нет.")
                 else:
                     enemy = random.choice(enemies)
-                    rounds, won, health = fight(enemy, health)
+                    rounds, won, health, loot = fight(enemy, health, bonus=ability_bonus)
                     for r in rounds:
                         log.append(r)
                     if won:
+                        gold_total += loot
                         enemies.remove(enemy)
-                        print(f"Враг {enemy} побеждён! В шахте осталось врагов: {len(enemies)}.")
+                        print(f"Враг {enemy} побеждён! В шахте осталось врагов: {len(enemies)}. "
+                              f"Добыча: {loot} золота.")
                     print(f"Бой длился раундов: {len(rounds)}.")
                     print(f"Последний раунд: урон героя {log[-1][1]:.1f}, урон врага {log[-1][2]}.")
 
@@ -264,7 +275,7 @@ try:
 
         # --- Состояние героя ---------------------------
         print()
-        print(f"Здоровье: {health:4d}   Масло в лампе: {lamp_oil:3d}   Удача: {luck:3d}   Врагов: {len(enemies)}")
+        print(f"Здоровье: {health:4d}   Масло в лампе: {lamp_oil:3d}   Удача: {luck:3d}   Врагов: {len(enemies)}   Золото: {gold_total}")
         print()
 
         # --- Проверка гибели ---------------------------
