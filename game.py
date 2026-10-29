@@ -79,6 +79,12 @@ print()
 # --- Враги и журнал боя ---------------------------
 enemies = ["крыса-мутант", "шахтёр-призрак", "угольный голем", "летучая мышь"]
 log = []
+enemy_stats = {
+    "крыса-мутант": {"hp": 30, "damage": 4, "loot": 15},
+    "шахтёр-призрак": {"hp": 45, "damage": 6, "loot": 25},
+    "угольный голем": {"hp": 60, "damage": 7, "loot": 35},
+    "летучая мышь": {"hp": 15, "damage": 2, "loot": 5},
+}
 gold_total = 0
 inventory = {}
 prices = {"bandage": 10, "lamp_oil": 15, "pickaxe": 40}
@@ -100,11 +106,14 @@ def fight(enemy, hero_health, bonus=0):
     """Бой с enemy до гибели одного из двоих.
     bonus - надбавка к урону героя, по умолчанию 0. Прибавляется
     после удвоения критом, то есть крит не удваивает надбавку.
-    Печатает строки раундов. Возвращает (rounds, won, hero_health, loot):
+    Карточка врага берётся из enemy_stats по имени, в ней нужны ключи
+    hp, damage и loot. Печатает строки раундов.
+    Возвращает (rounds, won, hero_health, loot):
     таблицу раундов, признак победы, здоровье после боя и золото.
     Глобальные переменные не меняет.
     """
-    enemy_hp = 45.0
+    stats = enemy_stats[enemy]
+    enemy_hp = float(stats["hp"])
     rounds = []
     round_n = 0
     print(f"Ты спускаешься по ржавой лестнице. Из темноты выходит {enemy}!")
@@ -117,19 +126,16 @@ def fight(enemy, hero_health, bonus=0):
         if crit:
             line += " - критический!"
         if enemy_hp <= 0:
-            line += " Враг падает."
+            line += " Враг падает." if crit else ". Враг падает."
             rounds.append([round_n, hit, 0])
         else:
-            enemy_hit = random.randint(2, 6)
+            enemy_hit = stats["damage"]
             hero_health -= enemy_hit
             line += f". У врага осталось {enemy_hp:.1f}. Ответный удар: {enemy_hit}."
             rounds.append([round_n, hit, enemy_hit])
         print(line)
     won = enemy_hp <= 0
-    if won:
-        loot = 10 + 5 * round_n
-    else:
-        loot = 0
+    loot = stats["loot"] if won else 0
     return rounds, won, hero_health, loot
 
 
