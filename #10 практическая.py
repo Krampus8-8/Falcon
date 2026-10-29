@@ -136,10 +136,15 @@ while True:
     print("--- Разбираем вместе ---")
     print("16 - Proc16 (Sign(A) + Sign(B))")
     print("19 - Proc19 (Площади трёх колец)")
+    print("22 - Proc22 (Калькулятор по номеру операции)")
     print("--- Делаем сами ---")
     print("17 - Proc17 (Количество корней уравнения)")
     print("18 - Proc18 (Площади трёх кругов)")
     print("20 - Proc20 [СЛОЖНОЕ] (Периметр равнобедренного треугольника)")
+    print("21 - Proc21 [СЛОЖНОЕ] (Сумма чисел на отрезке)")
+    print("23 - Proc23 (Координатная четверть)")
+    print("24 - Proc24 (Количество чётных)")
+    print("25 - Proc25 (Количество квадратов)")
     print("0  - Выход")
     print("=" * 60)
 
@@ -178,6 +183,34 @@ while True:
             a = float(input(f"Треугольник {i + 1}, основание a: "))
             h = float(input(f"Треугольник {i + 1}, высота h: "))
             print(triangle_p(a, h))
+
+    elif choice == "21":
+        a = int(input("A: "))
+        b = int(input("B: "))
+        c = int(input("C: "))
+        print(sum_range(a, b))
+        print(sum_range(b, c))
+
+    elif choice == "22":
+        a = float(input("A: "))
+        b = float(input("B: "))
+        for i in range(3):
+            op = int(input(f"Операция N{i + 1}: "))
+            print(calc(a, b, op))
+
+    elif choice == "23":
+        for i in range(3):
+            x = float(input(f"Точка {i + 1}, x: "))
+            y = float(input(f"Точка {i + 1}, y: "))
+            print(quarter(x, y))
+
+    elif choice == "24":
+        numbers = read_ten()
+        print("Чётных:", sum(1 for k in numbers if even(k)))
+
+    elif choice == "25":
+        numbers = read_ten()
+        print("Квадратов:", sum(1 for k in numbers if is_square(k)))
 
     else:
         print("Неверный ввод! Выберите номер из списка.")
