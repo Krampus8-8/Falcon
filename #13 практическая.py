@@ -28,10 +28,13 @@ while True:
     print("--- Разбираем вместе ---")
     print("1  - Matrix1  (Строка I заполнена числом 10*I)")
     print("4  - Matrix4  (Каждая строка - исходный набор)")
+    print("7  - Matrix7  (K-я строка матрицы)")
+    print("8  - Matrix8  (K-й столбец матрицы)")
     print("--- Делаем сами ---")
     print("2  - Matrix2  (Столбец J заполнен числом 5*J)")
     print("3  - Matrix3  (Каждый столбец - исходный набор)")
     print("5  - Matrix5  [СЛОЖНОЕ] (Столбцы с шагом D)")
+    print("6  - Matrix6  [СЛОЖНОЕ] (Строки с множителем Q)")
     print("0  - Выход")
     print("=" * 60)
 
@@ -89,6 +92,29 @@ while True:
         for i in range(m):
             matrix.append([values[i] + d * j for j in range(n)])
         print_matrix(matrix)
+
+    elif choice == "6":
+        # Matrix6. Первая строка - набор, каждая следующая умножена на Q.
+        m = int(input("M: "))
+        n = int(input("N: "))
+        q = int(input("Q: "))
+        values = read_values(n)
+        matrix = []
+        for i in range(m):
+            matrix.append([x * q ** i for x in values])
+        print_matrix(matrix)
+
+    elif choice == "7":
+        # Matrix7. Элементы K-й строки.
+        m, n, matrix = read_matrix()
+        k = int(input("K (номер строки): "))
+        print(matrix[k - 1])
+
+    elif choice == "8":
+        # Matrix8. Элементы K-го столбца.
+        m, n, matrix = read_matrix()
+        k = int(input("K (номер столбца): "))
+        print([row[k - 1] for row in matrix])
 
     else:
         print("Неверный ввод! Выберите номер из списка.")
