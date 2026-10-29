@@ -23,11 +23,13 @@ while True:
     print("5  - File5  (Количество элементов файла)")
     print("6  - File6  (K-й элемент файла)")
     print("7  - File7  (Первый, второй, предпоследний, последний)")
+    print("10 - File10 (Новый файл в обратном порядке)")
     print("--- Делаем сами ---")
     print("1  - File1  [СЛОЖНОЕ] (Допустимое ли имя файла)")
     print("3  - File3  (10 членов арифметической прогрессии)")
     print("4  - File4  (Сколько из четырёх файлов существует)")
     print("8  - File8  (Первый и последний элемент в новый файл)")
+    print("9  - File9  [СЛОЖНОЕ] (Конечный и начальный элемент в отсутствующий файл)")
     print("0  - Выход")
     print("=" * 60)
 
@@ -108,6 +110,26 @@ while True:
         nums = read_ints(first)
         write_ints(second, [nums[0], nums[-1]])
         print(f"Файл {second} создан.")
+
+    elif choice == "9":
+        # File9. Один файл есть, другого нет. В отсутствующий записать конечный и начальный.
+        name1 = input("Имя первого файла: ")
+        name2 = input("Имя второго файла: ")
+        if os.path.exists(name1):
+            source, target = name1, name2
+        else:
+            source, target = name2, name1
+        nums = read_ints(source)
+        write_ints(target, [nums[-1], nums[0]])
+        print(f"Файл {target} создан из {source}.")
+
+    elif choice == "10":
+        # File10. Новый файл с элементами в обратном порядке.
+        name = input("Исходный файл: ")
+        new_name = input("Новый файл: ")
+        nums = read_ints(name)
+        write_ints(new_name, nums[::-1])
+        print(f"Файл {new_name} записан.")
 
     else:
         print("Неверный ввод! Выберите номер из списка.")
