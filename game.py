@@ -78,7 +78,7 @@ enemies = ["крыса-мутант", "шахтёр-призрак", "уголь
 log = []
 
 running = True
-menu_last = 7
+menu_last = 8
 outcome = "прерывание"
 actions = 0
 try:
@@ -91,6 +91,7 @@ try:
         print("5 - зажечь шахтёрскую лампу")
         print("6 - тренировка")
         print("7 - спуститься глубже")
+        print("8 - таблица лидеров")
         print("0 - подняться на поверхность")
 
         # --- Проверка пункта меню ---------------------
@@ -99,12 +100,12 @@ try:
             try:
                 menu_number = int(choice)
             except ValueError:
-                print("Нет такого пункта. Введи номер из меню (0-7).")
+                print("Нет такого пункта. Введи номер из меню (0-8).")
                 continue
             if 0 <= menu_number <= menu_last:
                 choice = str(menu_number)
                 break
-            print("Нет такого пункта. Введи номер из меню (0-7).")
+            print("Нет такого пункта. Введи номер из меню (0-8).")
 
         # --- Выбор действия ----------------------------
         match choice:
@@ -187,18 +188,30 @@ try:
                                 print(f"Раунд {round_n}: ты наносишь {hit:.1f} - критический! Враг падает.")
                             else:
                                 print(f"Раунд {round_n}: ты наносишь {hit:.1f}. Враг падает.")
-                            log.append(f"раунд {round_n}: герой -{hit:.1f}, {enemy} -0")
+                            log.append([round_n, hit, 0])
                         else:
                             enemy_hit = random.randint(2, 6)
                             health -= enemy_hit
                             print(f"Раунд {round_n}: ты наносишь {hit:.1f}. У врага осталось {enemy_hp:.1f}. "
                                   f"Ответный удар: {enemy_hit}.")
-                            log.append(f"раунд {round_n}: герой -{hit:.1f}, {enemy} -{enemy_hit}")
+                            log.append([round_n, hit, enemy_hit])
                     if enemy_hp <= 0:
                         enemies.remove(enemy)
                         print(f"Враг {enemy} побеждён! В шахте осталось врагов: {len(enemies)}.")
                     print(f"Бой длился раундов: {round_n}.")
-                    print("Последняя запись журнала:", log[-1])
+                    print(f"Последний раунд: урон героя {log[-1][1]:.1f}, урон врага {log[-1][2]}.")
+
+            case "8":
+                if not log:
+                    print("Ты ещё ни с кем не сражался.")
+                else:
+                    top = sorted(log, key=lambda r: r[1], reverse=True)[:3]
+                    print("Таблица лидеров (урон героя):")
+                    for i in range(len(top)):
+                        print(f"{i + 1}. Раунд {top[i][0]}: {top[i][1]:.1f}")
+                    # при равных ударах max вернёт первый из них, меня это устраивает
+                    worst = max(log, key=lambda r: r[2])
+                    print(f"Самый сильный удар врага: {worst[2]} (раунд {worst[0]}).")
 
             case "0":
                 print("Ты поднимаешься по лестнице к солнцу. Шахта остаётся внизу.")
@@ -233,4 +246,10 @@ finally:
     else:
         print(f"Сеанс прерван, {hero_name}. Действий совершено: {actions}.")
         print("Шахта подождёт твоего возвращения.")
+    total = sum(r[1] for r in log)
+    rounds = len(log)
+    if rounds > 0:
+        print(f"Урон за забег: {total:.1f}, раундов: {rounds}, в среднем {total / rounds:.1f}.")
+    else:
+        print("В этом забеге боёв не было.")
     print(frame)
