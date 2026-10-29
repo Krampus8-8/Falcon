@@ -6,10 +6,15 @@ while True:
     print("--- Разбираем вместе ---")
     print("1  - List1  (Длина и первый элемент)")
     print("4  - List4  (Максимум и его индекс)")
+    print("6  - List6  (Срез от K1 до K2 и его сумма)")
+    print("8  - List8  (Удалить первое вхождение D)")
     print("--- Делаем сами ---")
     print("2  - List2  (A[K], последний элемент, сколько перед K)")
     print("3  - List3  (Сумма и произведение на чётных индексах)")
     print("5  - List5  (Добавить D в конец)")
+    print("7  - List7  (Обратный порядок без изменения списка)")
+    print("9  - List9  [HARD] (Элементы больше среднего)")
+    print("10 - List10 (Самая длинная и самая короткая строка)")
     print("0  - Выход")
     print("=" * 60)
 
@@ -61,6 +66,53 @@ while True:
         a.append(d)
         print(a)
         print("Длина:", len(a))
+
+    elif choice == "6":
+        # List6. Срез A[K1:K2+1] и сумма его элементов.
+        k1 = int(input("K1: "))
+        k2 = int(input("K2 (>= K1): "))
+        part = a[k1:k2 + 1]
+        print(part)
+        print("Сумма среза:", sum(part))
+
+    elif choice == "7":
+        # List7. Элементы в обратном порядке, исходный список не меняется.
+        print("Наоборот:", a[::-1])
+        print("Исходный:", a)
+
+    elif choice == "8":
+        # List8. Удалить первое вхождение D (если есть).
+        d = int(input("D: "))
+        if d in a:
+            a.remove(d)
+        print(a)
+        print("Длина:", len(a))
+
+    elif choice == "9":
+        # List9. Элементы больше среднего арифметического и их количество.
+        average = sum(a) / len(a)
+        bigger = []
+        for x in a:
+            if x > average:
+                bigger.append(x)
+        print("Больше среднего:", bigger)
+        print("Количество:", len(bigger))
+
+    elif choice == "10":
+        # List10. Самая длинная и самая короткая строка (первая из встретившихся).
+        n = int(input("Количество строк N: "))
+        words = []
+        for i in range(n):
+            words.append(input(f"Строка {i + 1}: "))
+        longest = words[0]
+        shortest = words[0]
+        for w in words:
+            if len(w) > len(longest):
+                longest = w
+            if len(w) < len(shortest):
+                shortest = w
+        print("Самая длинная:", longest, len(longest))
+        print("Самая короткая:", shortest, len(shortest))
 
     else:
         print("Неверный ввод! Выберите номер из списка.")
