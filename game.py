@@ -145,9 +145,9 @@ DIR_NAMES = {"north": "север", "south": "юг", "west": "запад", "east
 num_to_verb = {"1": "look", "2": "go", "3": "rest", "4": "knock",
                "5": "lamp", "6": "train", "7": "descend", "8": "leaders",
                "9": "shop", "10": "backpack", "11": "bandage", "12": "map",
-               "13": "scout", "0": "exit"}
+               "13": "scout", "14": "newgame", "0": "exit"}
 commands = ["look", "go", "go north/south/west/east", "rest", "knock", "lamp", "train", "descend",
-            "leaders", "shop", "backpack", "bandage", "map", "scout",
+            "leaders", "shop", "backpack", "bandage", "map", "scout", "newgame",
             "buy <товар> [количество]", "help", "exit"]
 MENU = ["Что делаешь? (номер или команда, help - справка)",
         "1 - осмотреться (look)",
@@ -163,6 +163,7 @@ MENU = ["Что делаешь? (номер или команда, help - спр
         "11 - перевязать раны (bandage)",
         "12 - карта шахты (map)",
         "13 - разведать штреки (scout)",
+        "14 - стереть сохранение (newgame)",
         "0 - подняться на поверхность (exit)"]
 
 
@@ -437,9 +438,17 @@ try:
                 seen = set()
                 print(f"Разведка: можно дойти до {scout(hero_r, hero_c, seen)} штреков.")
 
+            case "newgame":
+                if os.path.exists("save.json"):
+                    os.remove("save.json")
+                    print("Сохранение стёрто. Следующий забег начнётся с чистого листа.")
+                else:
+                    print("Сохранения нет, стирать нечего.")
+                continue
+
             case "help":
                 print("Команды: " + ", ".join(commands) + ".")
-                print("Номера 0-13 работают как раньше.")
+                print("Номера 0-14 работают как раньше.")
 
             case "exit":
                 print("Ты поднимаешься по лестнице к солнцу. Шахта остаётся внизу.")
@@ -468,11 +477,15 @@ try:
         # --- Проверка гибели ---------------------------
         if health <= 0:
             print(f"{hero_name} падает в темноте. Шахта забирает ещё одного искателя.")
+            if os.path.exists("save.json"):
+                os.remove("save.json")
             outcome = "гибель"
             running = False
 except KeyboardInterrupt:
     print()
     print("Игрок бросил кирку и убежал (Ctrl + C).")
+    write_save()
+    print("Прогресс сохранён.")
 finally:
     # --- Прощание ----------------------------------
     print(frame)
