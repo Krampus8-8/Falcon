@@ -16,6 +16,19 @@ import random
 
 import dungeon
 
+# цвет необязателен: без colorama игра работает обычным текстом
+try:
+    from colorama import Fore, Style, init
+    init()
+    COLOR = True
+except ImportError:
+    COLOR = False
+
+# Lib5. Из документации colorama, не было на занятии:
+# Fore.MAGENTA, Fore.CYAN, Fore.LIGHTYELLOW_EX - цвета текста;
+# Style.BRIGHT (яркий текст) и Style.DIM (тусклый текст) - стили.
+# Строка победы над врагом печатается Fore.LIGHTYELLOW_EX + Style.BRIGHT.
+
 # --- Заголовок ------------------------------------
 title = "ЗАБРОШЕННАЯ ШАХТА"
 frame = "=" * 23
@@ -278,8 +291,12 @@ try:
                     if won:
                         gold_total += loot
                         enemies.remove(enemy)
-                        print(f"Враг {enemy} побеждён! В шахте осталось врагов: {len(enemies)}. "
-                              f"Добыча: {loot} золота.")
+                        victory = (f"Враг {enemy} побеждён! В шахте осталось врагов: {len(enemies)}. "
+                                   f"Добыча: {loot} золота.")
+                        if COLOR:
+                            print(Fore.LIGHTYELLOW_EX + Style.BRIGHT + victory + Style.RESET_ALL)
+                        else:
+                            print(victory)
                     print(f"Бой длился раундов: {len(rounds)}.")
                     print(f"Последний раунд: урон героя {log[-1][1]:.1f}, урон врага {log[-1][2]}.")
 
@@ -369,8 +386,12 @@ try:
 
         # --- Состояние героя ---------------------------
         print()
-        print(f"Здоровье: {health:4d}   Масло в лампе: {lamp_oil:3d}   Удача: {luck:3d}   "
-              f"Врагов: {len(enemies)}   Золото: {gold_total}")
+        state = (f"Здоровье: {health:4d}   Масло в лампе: {lamp_oil:3d}   Удача: {luck:3d}   "
+                 f"Врагов: {len(enemies)}   Золото: {gold_total}")
+        if COLOR:
+            print(Fore.GREEN + state + Style.RESET_ALL)
+        else:
+            print(state)
         print()
 
         # --- Проверка гибели ---------------------------
