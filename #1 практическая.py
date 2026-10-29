@@ -13,6 +13,16 @@ while True:
     print("4  - Begin4  (Длина окружности по диаметру)")
     print("5  - Begin5  (Объём и площадь поверхности куба)")
     print("--- Делаем сами ---")
+    print("6  - Begin6  (Объём и площадь параллелепипеда)")
+    print("7  - Begin7  (Длина окружности и площадь круга)")
+    print("8  - Begin8  (Среднее арифметическое)")
+    print("9  - Begin9  [СЛОЖНОЕ] (Среднее геометрическое)")
+    print("10 - Begin10 (Действия с квадратами чисел)")
+    print("11 - Begin11 (Действия с модулями чисел)")
+    print("12 - Begin12 [СЛОЖНОЕ] (Гипотенуза и периметр)")
+    print("13 - Begin13 [СЛОЖНОЕ] (Площадь кольца)")
+    print("14 - Begin14 [СЛОЖНОЕ] (Радиус и площадь по длине окружности)")
+    print("15 - Begin15 [СЛОЖНОЕ] (Диаметр и длина окружности по площади)")
     print("0  - Выход")
     print("=" * 60)
 
@@ -56,6 +66,97 @@ while True:
         surface = 6 * edge ** 2
         print("Объём V =", volume)
         print("Площадь поверхности S =", surface)
+
+    elif choice == "6":
+        # Begin6. Даны ребра a, b, c параллелепипеда. V = a·b·c, S = 2·(a·b + b·c + a·c).
+        a = float(input("Ребро a: "))
+        b = float(input("Ребро b: "))
+        c = float(input("Ребро c: "))
+        volume = a * b * c
+        surface = 2 * (a * b + b * c + a * c)
+        print("Объём V =", volume)
+        print("Площадь поверхности S =", surface)
+
+    elif choice == "7":
+        # Begin7. Найти длину окружности L = 2·π·R и площадь круга S = π·R².
+        radius = float(input("Радиус R: "))
+        length = 2 * PI * radius
+        area = PI * radius ** 2
+        print("Длина окружности L =", length)
+        print("Площадь круга S =", area)
+
+    elif choice == "8":
+        # Begin8. Даны два числа a и b. Найти их среднее арифметическое.
+        a = float(input("Число a: "))
+        b = float(input("Число b: "))
+        average = (a + b) / 2
+        print("Среднее арифметическое =", average)
+
+    elif choice == "9":
+        # Begin9. Даны два неотрицательных числа. Найти среднее геометрическое √(a·b).
+        a = float(input("Число a (>= 0): "))
+        b = float(input("Число b (>= 0): "))
+        geometric = math.sqrt(a * b)
+        print("Среднее геометрическое =", geometric)
+
+    elif choice == "10":
+        # Begin10. Сумма, разность, произведение и частное квадратов двух ненулевых чисел.
+        a = float(input("Число a (не 0): "))
+        b = float(input("Число b (не 0): "))
+        sq_a = a ** 2
+        sq_b = b ** 2
+        print("Сумма квадратов:", sq_a + sq_b)
+        print("Разность квадратов:", sq_a - sq_b)
+        print("Произведение квадратов:", sq_a * sq_b)
+        print("Частное квадратов:", sq_a / sq_b)
+
+    elif choice == "11":
+        # Begin11. Сумма, разность, произведение и частное модулей двух ненулевых чисел.
+        a = float(input("Число a (не 0): "))
+        b = float(input("Число b (не 0): "))
+        abs_a = abs(a)
+        abs_b = abs(b)
+        print("Сумма модулей:", abs_a + abs_b)
+        print("Разность модулей:", abs_a - abs_b)
+        print("Произведение модулей:", abs_a * abs_b)
+        print("Частное модулей:", abs_a / abs_b)
+
+    elif choice == "12":
+        # Begin12. Катеты a и b. Гипотенуза c = √(a² + b²), периметр P = a + b + c.
+        a = float(input("Катет a: "))
+        b = float(input("Катет b: "))
+        hypotenuse = math.sqrt(a ** 2 + b ** 2)
+        perimeter = a + b + hypotenuse
+        print("Гипотенуза c =", hypotenuse)
+        print("Периметр P =", perimeter)
+
+    elif choice == "13":
+        # Begin13. Радиусы R1 > R2. S1 = π·R1², S2 = π·R2², S3 = S1 - S2 (кольцо).
+        r1 = float(input("Внешний радиус R1: "))
+        r2 = float(input("Внутренний радиус R2 (меньше R1): "))
+        s1 = PI * r1 ** 2
+        s2 = PI * r2 ** 2
+        s3 = s1 - s2
+        print("S1 =", s1)
+        print("S2 =", s2)
+        print("Площадь кольца S3 =", s3)
+
+    elif choice == "14":
+        # Begin14. Дана длина окружности L. Найти радиус R = L / (2·π) и площадь S = π·R².
+        length = float(input("Длина окружности L: "))
+        radius = length / (2 * PI)
+        area = PI * radius ** 2
+        print("Радиус R =", radius)
+        print("Площадь S =", area)
+
+    elif choice == "15":
+        # Begin15. Дана площадь круга S. Найти диаметр D и длину окружности L.
+        area = float(input("Площадь круга S: "))
+        radius = math.sqrt(area / PI)
+        diameter = 2 * radius
+        length = 2 * PI * radius
+        print("Диаметр D =", diameter)
+        print("Длина окружности L =", length)
 
     else:
         print("Неверный ввод! Выберите номер из списка.")
