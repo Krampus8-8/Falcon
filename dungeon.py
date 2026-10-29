@@ -1,9 +1,9 @@
-"""Правила игры «Заброшенная шахта»: удар героя, бой, покупка, цены и карточки врагов.
+"""Правила игры «Заброшенная шахта»: герой, враги, бой, покупка, цены и карточки врагов.
 
-Модуль не знает глобальных переменных game.py: урон героя и его здоровье
-приходят параметрами. Случайный выбор врага (random.choice) остаётся
-в game.py, потому что это часть сюжета, а не правило боя; здесь random
-нужен только самотесту.
+Модуль не знает глобальных переменных game.py: всё нужное приходит
+параметрами или живёт в объектах Hero и Enemy. Случайный выбор врага
+(random.choice) остаётся в game.py, потому что это часть сюжета, а не
+правило боя; здесь random нужен только самотесту.
 """
 import random
 
@@ -17,50 +17,101 @@ enemy_stats = {
 }
 
 
-def hero_hit(strike_n, damage, crit_damage):
-    """Урон героя в удар номер strike_n.
-    Возвращает пару (hit, crit): урон и признак критического удара.
-    Каждый третий удар критический.
-    """
-    if strike_n % 3 == 0:
-        return crit_damage, True
-    return damage, False
+class Hero:
+    """Герой забега: характеристики, урон и запас масла в лампе."""
+
+    def __init__(self, name, health, strength, agility, luck):
+        """Раскладывает характеристики по атрибутам и считает урон и масло."""
+        self.name = name
+        self.health = health
+        self.strength = strength
+        self.agility = agility
+        self.luck = luck
+        self.damage = 10 + strength * 1.5
+        self.crit_damage = self.damage * 2
+        # деление нацело, потому что половину раза лампу не зажечь
+        self.lamp_oil = (health + luck * 10) // 25
+
+    def __str__(self):
+        """Короткий формуляр героя одной строкой."""
+        return (f"{self.name}: здоровье {self.health}, урон {self.damage:.1f}, "
+                f"масло {self.lamp_oil}, удача {self.luck}")
+
+    def strike(self, n):
+        """Урон в удар номер n. Возвращает пару (урон, крит): каждый третий удар критический."""
+        if n % 3 == 0:
+            return self.crit_damage, True
+        return self.damage, False
+
+    def spend_oil(self, cost):
+        """Тратит cost масла. Если масла не хватает, недостающее берётся
+        из здоровья (по 10 за единицу), масло обнуляется.
+        Возвращает True, если пришлось идти в темноте, иначе False.
+        """
+        if self.lamp_oil >= cost:
+            self.lamp_oil -= cost
+            return False
+        self.health -= (cost - self.lamp_oil) * 10
+        self.lamp_oil = 0
+        return True
+
+    def heal(self, amount, cap):
+        """Лечит на amount, но не выше потолка cap. Возвращает None."""
+        self.health = min(self.health + amount, cap)
+
+    def to_dict(self):
+        """Словарь для сохранения: текущее состояние и характеристики настройки."""
+        return {"name": self.name, "health": self.health, "lamp_oil": self.lamp_oil,
+                "strength": self.strength, "agility": self.agility, "luck": self.luck}
+
+    @staticmethod
+    def from_dict(data):
+        """Создаёт героя из словаря сохранения и возвращает текущее масло."""
+        hero = Hero(data["name"], data["health"], data["strength"],
+                    data["agility"], data["luck"])
+        hero.lamp_oil = data["lamp_oil"]
+        return hero
 
 
-def fight(enemy, hero_health, bonus, damage, crit_damage):
-    """Бой с enemy до гибели одного из двоих.
+class Enemy:
+    """Враг на один бой: рабочая копия карточки из enemy_stats."""
+
+    def __init__(self, name, stats):
+        """name - имя врага, stats - карточка с ключами hp, damage и loot."""
+        self.name = name
+        self.hp = stats["hp"]
+        self.damage = stats["damage"]
+        self.loot = stats["loot"]
+
+
+def fight(enemy, hero, bonus=0):
+    """Бой врага enemy (объект Enemy) с героем hero (объект Hero).
     bonus - надбавка к урону героя, прибавляется после удвоения критом.
-    damage и crit_damage - обычный и критический урон героя.
-    Карточка врага берётся из enemy_stats по имени, в ней нужны ключи
-    hp, damage и loot. Печатает строки раундов.
-    Возвращает (rounds, won, hero_health, loot):
-    таблицу раундов, признак победы, здоровье после боя и золото.
+    Здоровье героя и врага меняется прямо в объектах. Печатает раунды.
+    Возвращает (rounds, won, loot): таблицу раундов, признак победы и золото.
     """
-    stats = enemy_stats[enemy]
-    enemy_hp = float(stats["hp"])
     rounds = []
     round_n = 0
-    print(f"Ты спускаешься по ржавой лестнице. Из темноты выходит {enemy}!")
-    while enemy_hp > 0 and hero_health > 0:
+    print(f"Ты спускаешься по ржавой лестнице. Из темноты выходит {enemy.name}!")
+    while enemy.hp > 0 and hero.health > 0:
         round_n += 1
-        hit, crit = hero_hit(round_n, damage, crit_damage)
+        hit, crit = hero.strike(round_n)
         hit = hit + bonus
-        enemy_hp -= hit
+        enemy.hp -= hit
         line = f"Раунд {round_n}: ты наносишь {hit:.1f}"
         if crit:
             line += " - критический!"
-        if enemy_hp <= 0:
+        if enemy.hp <= 0:
             line += " Враг падает." if crit else ". Враг падает."
             rounds.append([round_n, hit, 0])
         else:
-            enemy_hit = stats["damage"]
-            hero_health -= enemy_hit
-            line += f". У врага осталось {enemy_hp:.1f}. Ответный удар: {enemy_hit}."
-            rounds.append([round_n, hit, enemy_hit])
+            hero.health -= enemy.damage
+            line += f". У врага осталось {enemy.hp:.1f}. Ответный удар: {enemy.damage}."
+            rounds.append([round_n, hit, enemy.damage])
         print(line)
-    won = enemy_hp <= 0
-    loot = stats["loot"] if won else 0
-    return rounds, won, hero_health, loot
+    won = enemy.hp <= 0
+    loot = enemy.loot if won else 0
+    return rounds, won, loot
 
 
 def buy(price, gold, quantity=1):
@@ -75,6 +126,7 @@ def buy(price, gold, quantity=1):
 
 
 if __name__ == "__main__":
-    test_enemy = random.choice(list(enemy_stats))
-    rounds, won, hp, loot = fight(test_enemy, 100, 0, 20.5, 41.0)
-    print(f"самотест: раундов {len(rounds)}, победа={won}, добыча={loot}")
+    test_hero = Hero("Тест", 100, 7, 5, 4)
+    test_name = random.choice(list(enemy_stats))
+    rounds, won, loot = fight(Enemy(test_name, enemy_stats[test_name]), test_hero)
+    print(f"самотест: раундов {len(rounds)}, победа={won}, добыча={loot}, здоровье героя {test_hero.health}")

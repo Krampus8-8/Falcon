@@ -10,6 +10,7 @@
 # Новая кирка из лавки даёт +2 к урону за каждую купленную штуку,
 # две кирки дают +4. Бинты и масло не поднимают выше стартового запаса.
 # Команды можно вводить словами (go, buy bandage 2) или номерами.
+# Герой и враги - объекты классов Hero и Enemy из dungeon.py.
 # ================================================
 
 import json
@@ -31,11 +32,14 @@ except ImportError:
 # Style.BRIGHT (яркий текст) и Style.DIM (тусклый текст) - стили.
 # Строка победы над врагом печатается Fore.LIGHTYELLOW_EX + Style.BRIGHT.
 
+VERSION = "1.0"
+
 # --- Заголовок ------------------------------------
 title = "ЗАБРОШЕННАЯ ШАХТА"
 frame = "=" * 23
 print(frame)
 print("   " + title + "   ")
+print(f" v{VERSION}")
 print(frame)
 print()
 
@@ -48,8 +52,10 @@ if os.path.exists("save.json"):
         try:
             with open("save.json", encoding="utf-8") as f:
                 loaded = json.load(f)
-        except json.JSONDecodeError:
-            print("Файл сохранения испорчен, начинаем новый забег.")
+            if not isinstance(loaded.get("hero"), dict):
+                raise ValueError("старый формат сохранения")
+        except (json.JSONDecodeError, ValueError):
+            print("Файл сохранения испорчен или устарел, начинаем новый забег.")
             loaded = None
 
 if loaded is None:
@@ -84,35 +90,19 @@ if loaded is None:
             else:
                 print(f"{e}. Введи все четыре числа заново:")
 
-else:
-    hero_name = loaded["hero"]
-    health = loaded["health"]
-    strength = loaded["strength"]
-    agility = loaded["agility"]
-    luck = loaded["luck"]
+    hero = dungeon.Hero(hero_name, health, strength, agility, luck)
+    max_oil = hero.lamp_oil
+    max_health = hero.health
 
-# --- Расчёт урона ----------------------------------
-base_attack = 10
-damage = base_attack + strength * 1.5
-crit_damage = damage * 2
-# масло в лампе: сколько раз можно зажечь лампу.
-# деление нацело, потому что половину раза зажечь нельзя
-lamp_oil = (health + luck * 10) // 25
-max_oil = lamp_oil
-max_health = health
-
-if loaded is None:
     # --- Формуляр героя --------------------------------
     print("Характеристики героя:")
-    print(f"Здоровье: {health}")
-    print(f"Сила:     {strength}")
-    print(f"Ловкость: {agility}")
-    print(f"Удача:    {luck}")
+    print(hero)
+    print(f"Критический урон: {hero.crit_damage:.1f}")
     print()
-    print(f"Урон героя: {damage:.1f}")
-    print(f"Критический урон: {crit_damage:.1f}")
-    print(f"Масло в лампе: {lamp_oil}")
-    print()
+else:
+    hero = dungeon.Hero.from_dict(loaded["hero"])
+    max_oil = loaded["max_oil"]
+    max_health = loaded["max_health"]
 
 # --- Враги, журнал боя и рюкзак -------------------
 # цены лавки и карточки врагов живут в dungeon.py
@@ -198,16 +188,11 @@ def print_run_summary(log):
 
 def write_save():
     """Собирает состояние забега и пишет его в save.json.
-    Кортежи и множества превращает в списки: JSON их не знает.
-    Читает глобальные переменные игры. Возвращает None.
+    Герой сохраняется своим методом to_dict, кортежи и множества
+    превращаются в списки, потому что JSON их не знает. Возвращает None.
     """
     save = {}
-    save["hero"] = hero_name
-    save["health"] = health
-    save["strength"] = strength
-    save["agility"] = agility
-    save["luck"] = luck
-    save["lamp_oil"] = lamp_oil
+    save["hero"] = hero.to_dict()
     save["max_oil"] = max_oil
     save["max_health"] = max_health
     save["gold"] = gold_total
@@ -237,6 +222,21 @@ def scout(r, c, seen):
     return total
 
 
+def parse_command(line):
+    """Возвращает пару (verb, words): глагол и слова команды.
+    Номер пункта меню переводится в глагол через num_to_verb.
+    Для пустой строки возвращает ("", []).
+    """
+    cmd = line.strip().lower()
+    words = cmd.split()
+    if not words:
+        return "", []
+    verb = words[0]
+    if cmd in num_to_verb:
+        verb = num_to_verb[cmd]
+    return verb, words
+
+
 # --- Главный цикл игры ----------------------------
 running = True
 outcome = "прерывание"
@@ -244,9 +244,6 @@ actions = 0
 
 # --- Восстановление забега из сохранения ----------
 if loaded is not None:
-    lamp_oil = loaded["lamp_oil"]
-    max_oil = loaded["max_oil"]
-    max_health = loaded["max_health"]
     gold_total = loaded["gold"]
     ability_bonus = loaded["bonus"]
     actions = loaded["actions"]
@@ -256,7 +253,8 @@ if loaded is not None:
     hero_r, hero_c = loaded["position"]
     visited = {tuple(p) for p in loaded["visited"]}
     found_loot = set(loaded["loot"])
-    print(f"Забег продолжен, {hero_name}: здоровье {health}, золото {gold_total}, врагов осталось {len(enemies)}.")
+    print(f"Забег продолжен, {hero.name}: здоровье {hero.health}, золото {gold_total}, "
+          f"врагов осталось {len(enemies)}.")
     print()
 
 try:
@@ -265,15 +263,11 @@ try:
 
         # --- Чтение и разбор команды -----------------
         line = input()
-        cmd = line.strip().lower()
-        while cmd == "":
+        verb, words = parse_command(line)
+        while verb == "":
             print("Пустая команда. Введи команду или номер пункта.")
             line = input()
-            cmd = line.strip().lower()
-        words = cmd.split()
-        verb = words[0]
-        if cmd in num_to_verb:
-            verb = num_to_verb[cmd]
+            verb, words = parse_command(line)
 
         # --- Выбор действия ----------------------------
         match verb:
@@ -296,28 +290,24 @@ try:
                     else:
                         print(f"Нельзя пройти на {DIR_NAMES[words[1]]}: там стена.")
                 else:
-                    cost = 2
-                    if lamp_oil >= cost:
-                        lamp_oil -= cost
-                        print("Ты идёшь вперёд по рельсам. Под ногами хрустит уголь, лампа коптит.")
-                    else:
-                        health -= (cost - lamp_oil) * 10
-                        lamp_oil = 0
+                    if hero.spend_oil(2):
                         print("Лампа погасла. Ты идёшь на ощупь и ударяешься о балки.")
+                    else:
+                        print("Ты идёшь вперёд по рельсам. Под ногами хрустит уголь, лампа коптит.")
 
             case "rest":
                 # отдых даёт меньше, чем забирает дорога, и не больше полного запаса
-                lamp_oil = min(lamp_oil + 1, max_oil)
+                hero.lamp_oil = min(hero.lamp_oil + 1, max_oil)
                 print("Ты присел на ящик из-под динамита и немного отдохнул.")
 
             case "knock":
-                luck = luck + 1
+                hero.luck += 1
                 print("Ты стучишь по стене. В одном месте звук глухой: там пустота! Удача на твоей стороне.")
 
             case "lamp":
-                if lamp_oil >= 1:
-                    lamp_oil -= 1
-                    health = health + 5
+                if hero.lamp_oil >= 1:
+                    hero.lamp_oil -= 1
+                    hero.health += 5
                     print("Ты зажёг лампу ярче. Стало светло и не так страшно, ты приободрился.")
                 else:
                     print("Масла не осталось, лампа не зажигается.")
@@ -331,7 +321,7 @@ try:
                 print()
                 print(f"Наносишь {strikes} ударов.")
                 for i in range(1, strikes + 1):
-                    hit_damage, crit = dungeon.hero_hit(i, damage, crit_damage)
+                    hit_damage, crit = hero.strike(i)
                     if crit:
                         crit_count += 1
                         print(f"Удар {i}: {hit_damage:.1f} - критический!")
@@ -339,12 +329,7 @@ try:
                         print(f"Удар {i}: {hit_damage:.1f}")
                     total_damage += hit_damage
                 # тренировка тяжелее дороги, поэтому забирает больше масла
-                cost = 3
-                if lamp_oil >= cost:
-                    lamp_oil -= cost
-                else:
-                    health -= (cost - lamp_oil) * 10
-                    lamp_oil = 0
+                hero.spend_oil(3)
                 print()
                 print(f"Итог: {strikes} ударов, критических ударов: {crit_count}")
                 print(f"Общий урон: {total_damage:.1f}")
@@ -355,7 +340,8 @@ try:
                     print("Ты спускаешься ниже, но шахта пуста: врагов больше нет.")
                 else:
                     enemy = random.choice(enemies)
-                    rounds, won, health, loot = dungeon.fight(enemy, health, ability_bonus, damage, crit_damage)
+                    foe = dungeon.Enemy(enemy, dungeon.enemy_stats[enemy])
+                    rounds, won, loot = dungeon.fight(foe, hero, ability_bonus)
                     for r in rounds:
                         log.append(r)
                     if won:
@@ -397,7 +383,7 @@ try:
                 if ok:
                     if item == "lamp_oil":
                         # масло сразу заливаем в лампу
-                        lamp_oil = min(lamp_oil + 5 * qty, max_oil)
+                        hero.lamp_oil = min(hero.lamp_oil + 5 * qty, max_oil)
                     else:
                         if item == "pickaxe":
                             ability_bonus += 2 * qty
@@ -418,11 +404,11 @@ try:
                 if inventory.get("bandage", 0) == 0:
                     print("В рюкзаке нет бинтов.")
                 else:
-                    health = min(health + 10, max_health)
+                    hero.heal(10, max_health)
                     inventory["bandage"] -= 1
                     if inventory["bandage"] == 0:
                         del inventory["bandage"]
-                    print(f"Ты перевязал раны. Здоровье: {health}. Бинтов осталось: {inventory.get('bandage', 0)}.")
+                    print(f"Ты перевязал раны. Здоровье: {hero.health}. Бинтов осталось: {inventory.get('bandage', 0)}.")
 
             case "map":
                 print("Карта шахты (@ - ты):")
@@ -466,7 +452,7 @@ try:
 
         # --- Состояние героя ---------------------------
         print()
-        state = (f"Здоровье: {health:4d}   Масло в лампе: {lamp_oil:3d}   Удача: {luck:3d}   "
+        state = (f"Здоровье: {hero.health:4d}   Масло в лампе: {hero.lamp_oil:3d}   Удача: {hero.luck:3d}   "
                  f"Врагов: {len(enemies)}   Золото: {gold_total}")
         if COLOR:
             print(Fore.GREEN + state + Style.RESET_ALL)
@@ -475,8 +461,8 @@ try:
         print()
 
         # --- Проверка гибели ---------------------------
-        if health <= 0:
-            print(f"{hero_name} падает в темноте. Шахта забирает ещё одного искателя.")
+        if hero.health <= 0:
+            print(f"{hero.name} падает в темноте. Шахта забирает ещё одного искателя.")
             if os.path.exists("save.json"):
                 os.remove("save.json")
             outcome = "гибель"
@@ -490,13 +476,13 @@ finally:
     # --- Прощание ----------------------------------
     print(frame)
     if outcome == "гибель":
-        print(f"Ты не выбрался, {hero_name}. Действий совершено: {actions}.")
+        print(f"Ты не выбрался, {hero.name}. Действий совершено: {actions}.")
         print("Может, в следующий раз возьмёшь больше масла.")
     elif outcome == "выход":
-        print(f"Забег окончен, {hero_name}. Действий совершено: {actions}.")
+        print(f"Забег окончен, {hero.name}. Действий совершено: {actions}.")
         print("Ты снова видишь небо. Отличная работа!")
     else:
-        print(f"Сеанс прерван, {hero_name}. Действий совершено: {actions}.")
+        print(f"Сеанс прерван, {hero.name}. Действий совершено: {actions}.")
         print("Шахта подождёт твоего возвращения.")
     print_run_summary(log)
     if inventory:
