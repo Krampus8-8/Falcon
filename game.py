@@ -128,6 +128,17 @@ def fight(enemy, hero_health, bonus=0):
     return rounds, won, hero_health, loot
 
 
+def buy(price, gold, quantity=1):
+    """Покупает quantity штук товара ценой price за золото gold.
+    quantity по умолчанию 1. Возвращает (gold_left, ok): остаток
+    золота и признак успешной покупки. Ничего не печатает.
+    """
+    cost = price * quantity
+    if gold >= cost:
+        return gold - cost, True
+    return gold, False
+
+
 def print_leaderboard(log):
     """Печатает топ-3 раундов по урону героя и самый сильный удар врага.
     Возвращает None: задача функции - печать, а не данные.
@@ -157,7 +168,7 @@ def print_run_summary(log):
 
 
 running = True
-menu_last = 8
+menu_last = 9
 outcome = "прерывание"
 actions = 0
 try:
@@ -171,6 +182,7 @@ try:
         print("6 - тренировка")
         print("7 - спуститься глубже")
         print("8 - таблица лидеров")
+        print("9 - лавка старого шахтёра")
         print("0 - подняться на поверхность")
 
         # --- Проверка пункта меню ---------------------
@@ -179,12 +191,12 @@ try:
             try:
                 menu_number = int(choice)
             except ValueError:
-                print("Нет такого пункта. Введи номер из меню (0-8).")
+                print("Нет такого пункта. Введи номер из меню (0-9).")
                 continue
             if 0 <= menu_number <= menu_last:
                 choice = str(menu_number)
                 break
-            print("Нет такого пункта. Введи номер из меню (0-8).")
+            print("Нет такого пункта. Введи номер из меню (0-9).")
 
         # --- Выбор действия ----------------------------
         match choice:
@@ -264,6 +276,43 @@ try:
 
             case "8":
                 print_leaderboard(log)
+
+            case "9":
+                print("Лавка старого шахтёра:")
+                print("1 - бинты (+10 здоровья): 10 золота")
+                print("2 - масло для лампы (+5 масла): 15 золота")
+                print("3 - новая кирка (+2 к урону до конца забега): 40 золота")
+                print("Номер товара (0 - ничего не покупать):")
+                item = input()
+                prices = (10, 15, 40)
+                names = ("бинты", "масло для лампы", "новая кирка")
+                if item in ("1", "2", "3"):
+                    price = prices[int(item) - 1]
+                    name = names[int(item) - 1]
+                    print("Сколько штук (Enter - одна):")
+                    while True:
+                        qty_line = input()
+                        if qty_line == "":
+                            break
+                        try:
+                            if int(qty_line) > 0:
+                                break
+                        except ValueError:
+                            pass
+                        print("Нужно целое число больше нуля или просто Enter:")
+                    if qty_line == "":
+                        qty = 1
+                        gold_total, ok = buy(price, gold_total)
+                    else:
+                        qty = int(qty_line)
+                        gold_total, ok = buy(price, gold_total, quantity=qty)
+                    if ok:
+                        # EFFECTS
+                        print(f"Куплено: {name} x{qty} за {price * qty} золота. Осталось золота: {gold_total}.")
+                    else:
+                        print(f"Не хватает золота: нужно {price * qty}, есть {gold_total}.")
+                elif item != "0":
+                    print("Такого товара в лавке нет.")
 
             case "0":
                 print("Ты поднимаешься по лестнице к солнцу. Шахта остаётся внизу.")
