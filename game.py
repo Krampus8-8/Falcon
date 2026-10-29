@@ -59,6 +59,7 @@ print("2 - идти вперёд")
 print("3 - отдохнуть")
 print("4 - постучать по стене")
 print("5 - зажечь шахтёрскую лампу")
+print("6 - тренировка")
 print()
 
 # --- Выбор действия --------------------------------
@@ -83,6 +84,30 @@ match choice:
         lamp_oil = lamp_oil - 1
         health = health + 5
         print("Ты зажёг лампу ярче. Стало светло и не так страшно, ты приободрился.")
+
+    case "6":
+        strikes = 6
+        total_damage = 0
+        crit_count = 0
+        print("В тупике висит старый мешок с углём.")
+        print("Шахтёры били по нему кирками, когда спорили, кто сильнее.")
+        print()
+        print(f"Наносишь {strikes} ударов.")
+        for i in range(1, strikes + 1):
+            if i % 3 == 0:
+                hit_damage = crit_damage
+                print(f"Удар {i}: {hit_damage:.1f} - критический!")
+                crit_count += 1
+            else:
+                hit_damage = damage
+                print(f"Удар {i}: {hit_damage:.1f}")
+            total_damage += hit_damage
+        # тренировка тяжелее дороги, поэтому забирает больше масла
+        lamp_oil = lamp_oil - 3
+        print()
+        print(f"Итог: {strikes} ударов, критических ударов: {crit_count}")
+        print(f"Общий урон: {total_damage:.1f}")
+        print(f"Средний урон: {total_damage / strikes:.1f}")
 
     case _:
         print("Такого действия нет.")
