@@ -73,3 +73,8 @@ def buy(price, gold, quantity=1):
         return gold - cost, True
     return gold, False
 
+
+if __name__ == "__main__":
+    test_enemy = random.choice(list(enemy_stats))
+    rounds, won, hp, loot = fight(test_enemy, 100, 0, 20.5, 41.0)
+    print(f"самотест: раундов {len(rounds)}, победа={won}, добыча={loot}")
