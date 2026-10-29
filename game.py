@@ -12,6 +12,8 @@
 # Команды можно вводить словами (go, buy bandage 2) или номерами.
 # ================================================
 
+import json
+import os
 import random
 
 import dungeon
@@ -169,6 +171,33 @@ def print_run_summary(log):
         print(f"Урон за забег: {total:.1f}, раундов: {rounds}, в среднем {total / rounds:.1f}.")
     else:
         print("В этом забеге боёв не было.")
+
+
+def write_save():
+    """Собирает состояние забега и пишет его в save.json.
+    Кортежи и множества превращает в списки: JSON их не знает.
+    Читает глобальные переменные игры. Возвращает None.
+    """
+    save = {}
+    save["hero"] = hero_name
+    save["health"] = health
+    save["strength"] = strength
+    save["agility"] = agility
+    save["luck"] = luck
+    save["lamp_oil"] = lamp_oil
+    save["max_oil"] = max_oil
+    save["max_health"] = max_health
+    save["gold"] = gold_total
+    save["bonus"] = ability_bonus
+    save["actions"] = actions
+    save["enemies"] = enemies
+    save["inventory"] = inventory
+    save["log"] = log
+    save["position"] = [hero_r, hero_c]
+    save["visited"] = [list(p) for p in visited]
+    save["loot"] = sorted(found_loot)
+    with open("save.json", "w", encoding="utf-8") as f:
+        json.dump(save, f, ensure_ascii=False, indent=2)
 
 
 def scout(r, c, seen):
@@ -374,6 +403,8 @@ try:
 
             case "exit":
                 print("Ты поднимаешься по лестнице к солнцу. Шахта остаётся внизу.")
+                write_save()
+                print("Прогресс сохранён.")
                 outcome = "выход"
                 running = False
 
