@@ -9,6 +9,8 @@ while True:
     print("22 - Begin22 (Обмен значений A и B)")
     print("25 - Begin25 (Функция y = 3x^6 - 6x^2 - 7)")
     print("29 - Begin29 (Градусы в радианы)")
+    print("41 - Integer1 (Полные метры в сантиметрах)")
+    print("45 - Integer5 (Незанятая часть отрезка)")
     print("--- Делаем сами ---")
     print("23 - Begin23 (Сдвиг A -> B -> C -> A)")
     print("24 - Begin24 (Сдвиг A -> C -> B -> A)")
@@ -22,6 +24,9 @@ while True:
     print("34 - Begin34 [СЛОЖНОЕ] (Шоколадные конфеты и ириски)")
     print("35 - Begin35 [СЛОЖНОЕ] (Путь лодки)")
     print("36 - Begin36 [СЛОЖНОЕ] (Расстояние между автомобилями)")
+    print("42 - Integer2 (Полные тонны)")
+    print("43 - Integer3 (Полные килобайты)")
+    print("44 - Integer4 (Сколько отрезков B на отрезке A)")
     print("0  - Выход")
     print("=" * 60)
 
@@ -168,6 +173,38 @@ while True:
         hours = float(input("Время T (ч): "))
         new_distance = start_distance + (speed1 + speed2) * hours
         print("Расстояние через T часов:", new_distance)
+
+    elif choice == "41":
+        # Integer1. Расстояние L в см. Найти количество полных метров.
+        length_cm = int(input("L (см): "))
+        meters = length_cm // 100
+        print("Полных метров:", meters)
+
+    elif choice == "42":
+        # Integer2. Масса M в кг. Найти количество полных тонн.
+        mass_kg = int(input("M (кг): "))
+        tons = mass_kg // 1000
+        print("Полных тонн:", tons)
+
+    elif choice == "43":
+        # Integer3. Размер файла в байтах. Найти количество полных килобайтов.
+        size_bytes = int(input("Размер (байт): "))
+        kilobytes = size_bytes // 1024
+        print("Полных килобайтов:", kilobytes)
+
+    elif choice == "44":
+        # Integer4. Сколько отрезков B поместится на отрезке A (A > B).
+        segment = int(input("A: "))
+        piece = int(input("B: "))
+        pieces_count = segment // piece
+        print("Поместится отрезков:", pieces_count)
+
+    elif choice == "45":
+        # Integer5. Длина незанятой части отрезка A.
+        segment = int(input("A: "))
+        piece = int(input("B: "))
+        free_part = segment % piece
+        print("Незанятая часть:", free_part)
 
     else:
         print("Неверный ввод! Выберите номер из списка.")
