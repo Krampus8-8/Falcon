@@ -8,6 +8,7 @@ while True:
     print("4  - List4  (Максимум и его индекс)")
     print("6  - List6  (Срез от K1 до K2 и его сумма)")
     print("8  - List8  (Удалить первое вхождение D)")
+    print("11 - List11 (Отрицательные заменить нулями)")
     print("--- Делаем сами ---")
     print("2  - List2  (A[K], последний элемент, сколько перед K)")
     print("3  - List3  (Сумма и произведение на чётных индексах)")
@@ -15,6 +16,10 @@ while True:
     print("7  - List7  (Обратный порядок без изменения списка)")
     print("9  - List9  [HARD] (Элементы больше среднего)")
     print("10 - List10 (Самая длинная и самая короткая строка)")
+    print("12 - List12 (Вставить 0 в позицию K)")
+    print("13 - List13 (Удалить последний элемент)")
+    print("14 - List14 [HARD] (Количество D и индекс первого)")
+    print("15 - List15 (Элементы на нечётных позициях)")
     print("0  - Выход")
     print("=" * 60)
 
@@ -113,6 +118,47 @@ while True:
                 shortest = w
         print("Самая длинная:", longest, len(longest))
         print("Самая короткая:", shortest, len(shortest))
+
+    elif choice == "11":
+        # List11. Отрицательные заменить нулями, вывести список и число замен.
+        replaced = 0
+        for i in range(len(a)):
+            if a[i] < 0:
+                a[i] = 0
+                replaced += 1
+        print(a)
+        print("Заменено:", replaced)
+
+    elif choice == "12":
+        # List12. Вставить 0 в позицию K (insert).
+        k = int(input("Позиция K (0..N): "))
+        a.insert(k, 0)
+        print(a)
+        print("Длина:", len(a))
+
+    elif choice == "13":
+        # List13. Удалить последний элемент (pop).
+        removed = a.pop()
+        print("Удалён:", removed)
+        print(a)
+
+    elif choice == "14":
+        # List14. Число вхождений D и индекс первого вхождения (или -1).
+        d = int(input("D: "))
+        print("Вхождений:", a.count(d))
+        if d in a:
+            print("Первый индекс:", a.index(d))
+        else:
+            print("Первый индекс:", -1)
+
+    elif choice == "15":
+        # List15. Элементы на нечётных позициях и их сумма.
+        # по подсказке к задаче обходим индексы 1, 3, 5...
+        odd_positions = []
+        for i in range(1, len(a), 2):
+            odd_positions.append(a[i])
+        print(odd_positions)
+        print("Сумма:", sum(odd_positions))
 
     else:
         print("Неверный ввод! Выберите номер из списка.")
