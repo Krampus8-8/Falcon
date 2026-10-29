@@ -7,6 +7,8 @@ while True:
     print("1  - While1  (Незанятая часть отрезка без * и /)")
     print("3  - While3  (Частное и остаток через + и -)")
     print("8  - While8  (Наибольшее K, где K^2 <= N)")
+    print("11 - While11 (Наименьшее K, где 1+2+...+K >= N)")
+    print("15 - While15 (Вклад больше 1100 руб.)")
     print("--- Делаем сами ---")
     print("2  - While2  (Сколько отрезков B на A без * и /)")
     print("4  - While4  [СЛОЖНОЕ] (N является степенью 3?)")
@@ -15,6 +17,9 @@ while True:
     print("7  - While7  [СЛОЖНОЕ] (Наименьшее K, где K^2 > N)")
     print("9  - While9  (Наименьшее K, где 3^K > N)")
     print("10 - While10 (Наибольшее K, где 3^K < N)")
+    print("12 - While12 [СЛОЖНОЕ] (Наибольшее K, где 1+2+...+K <= N)")
+    print("13 - While13 (Наименьшее K, где 1+1/2+...+1/K > A)")
+    print("14 - While14 [СЛОЖНОЕ] (Наибольшее K, где 1+1/2+...+1/K < A)")
     print("0  - Выход")
     print("=" * 60)
 
@@ -117,6 +122,61 @@ while True:
             power *= 3
             k += 1
         print("K =", k)
+
+    elif choice == "11":
+        # While11. Наименьшее K, где 1 + 2 + ... + K >= N, и эта сумма.
+        n = int(input("N: "))
+        k = 0
+        total = 0
+        while total < n:
+            k += 1
+            total += k
+        print("K =", k)
+        print("Сумма =", total)
+
+    elif choice == "12":
+        # While12. Наибольшее K, где 1 + 2 + ... + K <= N, и эта сумма.
+        n = int(input("N: "))
+        k = 0
+        total = 0
+        while total + (k + 1) <= n:
+            k += 1
+            total += k
+        print("K =", k)
+        print("Сумма =", total)
+
+    elif choice == "13":
+        # While13. Наименьшее K, где 1 + 1/2 + ... + 1/K > A, и эта сумма.
+        a = float(input("A (> 1): "))
+        k = 0
+        total = 0.0
+        while total <= a:
+            k += 1
+            total += 1 / k
+        print("K =", k)
+        print("Сумма =", total)
+
+    elif choice == "14":
+        # While14. Наибольшее K, где 1 + 1/2 + ... + 1/K < A, и эта сумма.
+        a = float(input("A (> 1): "))
+        k = 0
+        total = 0.0
+        while total + 1 / (k + 1) < a:
+            k += 1
+            total += 1 / k
+        print("K =", k)
+        print("Сумма =", total)
+
+    elif choice == "15":
+        # While15. Вклад 1000 руб., растёт на P% в месяц. Когда превысит 1100?
+        percent = float(input("P (0 < P < 25): "))
+        deposit = 1000.0
+        months = 0
+        while deposit <= 1100:
+            deposit += deposit * percent / 100
+            months += 1
+        print("Месяцев K =", months)
+        print("Вклад S =", deposit)
 
     else:
         print("Неверный ввод! Выберите номер из списка.")
