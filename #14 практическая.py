@@ -47,8 +47,13 @@ while True:
 
     elif choice == "1":
         # Lib1. В dungeon.py есть правила, а в game.py их больше нет.
-        for name in ("hero_hit", "fight", "buy", "prices", "enemy_stats"):
+        for name in ("fight", "buy", "prices", "enemy_stats"):
             print(f"dungeon.{name}:", "есть" if hasattr(dungeon, name) else "НЕТ")
+        # с этапа 16 функция hero_hit стала методом strike класса Hero
+        if hasattr(dungeon, "hero_hit"):
+            print("dungeon.hero_hit: есть")
+        else:
+            print("dungeon.Hero.strike (бывшая hero_hit):", "есть" if hasattr(dungeon.Hero, "strike") else "НЕТ")
         game_code = open(os.path.join(HERE, "game.py"), encoding="utf-8").read()
         print("def fight в game.py:", "осталась" if "def fight" in game_code else "нет, перенесена")
         print("Вызов в game.py через модуль:", "dungeon.fight(" in game_code)
