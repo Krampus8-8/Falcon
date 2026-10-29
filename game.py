@@ -179,7 +179,7 @@ def print_run_summary(log):
 
 
 running = True
-menu_last = 10
+menu_last = 11
 outcome = "прерывание"
 actions = 0
 try:
@@ -195,6 +195,7 @@ try:
         print("8 - таблица лидеров")
         print("9 - лавка старого шахтёра")
         print("10 - рюкзак")
+        print("11 - перевязать раны")
         print("0 - подняться на поверхность")
 
         # --- Проверка пункта меню ---------------------
@@ -203,12 +204,12 @@ try:
             try:
                 menu_number = int(choice)
             except ValueError:
-                print("Нет такого пункта. Введи номер из меню (0-10).")
+                print("Нет такого пункта. Введи номер из меню (0-11).")
                 continue
             if 0 <= menu_number <= menu_last:
                 choice = str(menu_number)
                 break
-            print("Нет такого пункта. Введи номер из меню (0-10).")
+            print("Нет такого пункта. Введи номер из меню (0-11).")
 
         # --- Выбор действия ----------------------------
         match choice:
@@ -338,6 +339,16 @@ try:
                     for name, qty in inventory.items():
                         print(f"{name}: {qty} шт.")
 
+            case "11":
+                if inventory.get("bandage", 0) == 0:
+                    print("В рюкзаке нет бинтов.")
+                else:
+                    health = min(health + 10, max_health)
+                    inventory["bandage"] -= 1
+                    if inventory["bandage"] == 0:
+                        del inventory["bandage"]
+                    print(f"Ты перевязал раны. Здоровье: {health}. Бинтов осталось: {inventory.get('bandage', 0)}.")
+
             case "0":
                 print("Ты поднимаешься по лестнице к солнцу. Шахта остаётся внизу.")
                 outcome = "выход"
@@ -372,4 +383,10 @@ finally:
         print(f"Сеанс прерван, {hero_name}. Действий совершено: {actions}.")
         print("Шахта подождёт твоего возвращения.")
     print_run_summary(log)
+    if inventory:
+        print("В рюкзаке осталось:")
+        for name, qty in inventory.items():
+            print(f"{name}: {qty} шт.")
+    else:
+        print("В рюкзаке осталось: ничего.")
     print(frame)
