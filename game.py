@@ -147,7 +147,7 @@ def print_leaderboard(log):
         print("Ты ещё ни с кем не сражался.")
         return
     top = sorted(log, key=lambda r: r[1], reverse=True)[:3]
-    print("Таблица лидеров (урон героя):")
+    print(f"Таблица лидеров (урон героя, всего раундов: {len(log)}):")
     for i in range(len(top)):
         print(f"{i + 1}. Раунд {top[i][0]}: {top[i][1]:.1f}")
     # при равных ударах max вернёт первый из них, меня это устраивает
