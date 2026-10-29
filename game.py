@@ -8,6 +8,8 @@
 # за это прибавляется удача.
 # Масло в лампе - это запас сил героя. Без света
 # идти опасно: недостающее масло забирает здоровье.
+# Новая кирка из лавки даёт +2 к урону за каждую купленную штуку,
+# две кирки дают +4. Бинты и масло не поднимают выше стартового запаса.
 # ================================================
 
 import random
@@ -59,6 +61,7 @@ crit_damage = damage * 2
 # деление нацело, потому что половину раза зажечь нельзя
 lamp_oil = (health + luck * 10) // 25
 max_oil = lamp_oil
+max_health = health
 
 # --- Формуляр героя --------------------------------
 print("Характеристики героя:")
@@ -307,7 +310,12 @@ try:
                         qty = int(qty_line)
                         gold_total, ok = buy(price, gold_total, quantity=qty)
                     if ok:
-                        # EFFECTS
+                        if item == "1":
+                            health = min(health + 10 * qty, max_health)
+                        elif item == "2":
+                            lamp_oil = min(lamp_oil + 5 * qty, max_oil)
+                        else:
+                            ability_bonus += 2 * qty
                         print(f"Куплено: {name} x{qty} за {price * qty} золота. Осталось золота: {gold_total}.")
                     else:
                         print(f"Не хватает золота: нужно {price * qty}, есть {gold_total}.")
