@@ -80,6 +80,7 @@ print()
 enemies = ["крыса-мутант", "шахтёр-призрак", "угольный голем", "летучая мышь"]
 log = []
 gold_total = 0
+prices = {"bandage": 10, "lamp_oil": 15, "pickaxe": 40}
 ability_bonus = 0
 
 
@@ -282,45 +283,44 @@ try:
 
             case "9":
                 print("Лавка старого шахтёра:")
-                print("1 - бинты (+10 здоровья): 10 золота")
-                print("2 - масло для лампы (+5 масла): 15 золота")
-                print("3 - новая кирка (+2 к урону до конца забега): 40 золота")
-                print("Номер товара (0 - ничего не покупать):")
-                item = input()
-                prices = (10, 15, 40)
-                names = ("бинты", "масло для лампы", "новая кирка")
-                if item in ("1", "2", "3"):
-                    price = prices[int(item) - 1]
-                    name = names[int(item) - 1]
-                    print("Сколько штук (Enter - одна):")
-                    while True:
-                        qty_line = input()
-                        if qty_line == "":
-                            break
-                        try:
-                            if int(qty_line) > 0:
+                print("(bandage - бинты +10 здоровья, lamp_oil - масло +5, pickaxe - кирка +2 к урону)")
+                for name, price in prices.items():
+                    print(f"{name}: {price} золота")
+                print("Название товара (пустая строка - ничего не покупать):")
+                name = input().strip()
+                if name != "":
+                    if name in prices:
+                        price = prices[name]
+                        print("Сколько штук (Enter - одна):")
+                        while True:
+                            qty_line = input()
+                            if qty_line == "":
                                 break
-                        except ValueError:
-                            pass
-                        print("Нужно целое число больше нуля или просто Enter:")
-                    if qty_line == "":
-                        qty = 1
-                        gold_total, ok = buy(price, gold_total)
-                    else:
-                        qty = int(qty_line)
-                        gold_total, ok = buy(price, gold_total, quantity=qty)
-                    if ok:
-                        if item == "1":
-                            health = min(health + 10 * qty, max_health)
-                        elif item == "2":
-                            lamp_oil = min(lamp_oil + 5 * qty, max_oil)
+                            try:
+                                if int(qty_line) > 0:
+                                    break
+                            except ValueError:
+                                pass
+                            print("Нужно целое число больше нуля или просто Enter:")
+                        if qty_line == "":
+                            qty = 1
+                            gold_total, ok = buy(price, gold_total)
                         else:
-                            ability_bonus += 2 * qty
-                        print(f"Куплено: {name} x{qty} за {price * qty} золота. Осталось золота: {gold_total}.")
+                            qty = int(qty_line)
+                            gold_total, ok = buy(price, gold_total, quantity=qty)
+                        if ok:
+                            if name == "lamp_oil":
+                                # масло сразу заливаем в лампу
+                                lamp_oil = min(lamp_oil + 5 * qty, max_oil)
+                            else:
+                                if name == "pickaxe":
+                                    ability_bonus += 2 * qty
+                                # BACKPACK
+                            print(f"Куплено: {name} x{qty} за {price * qty} золота. Осталось золота: {gold_total}.")
+                        else:
+                            print(f"Не хватает золота: нужно {price * qty}, есть {gold_total}.")
                     else:
-                        print(f"Не хватает золота: нужно {price * qty}, есть {gold_total}.")
-                elif item != "0":
-                    print("Такого товара в лавке нет.")
+                        print("Такого товара в лавке нет.")
 
             case "0":
                 print("Ты поднимаешься по лестнице к солнцу. Шахта остаётся внизу.")
