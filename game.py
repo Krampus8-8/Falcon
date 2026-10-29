@@ -3,13 +3,13 @@
 # Автор: Кашулинский Лев
 # Дата: сентябрь 2026
 #
-# Пункт 4 - «постучать по стене»: герой стучит
-# по камню и по звуку ищет пустоты и тайники,
-# за это прибавляется удача.
+# Пункт 4 - «постучать по стене» (knock): герой стучит
+# по камню и по звуку ищет пустоты, за это растёт удача.
 # Масло в лампе - это запас сил героя. Без света
 # идти опасно: недостающее масло забирает здоровье.
 # Новая кирка из лавки даёт +2 к урону за каждую купленную штуку,
 # две кирки дают +4. Бинты и масло не поднимают выше стартового запаса.
+# Команды можно вводить словами (go, buy bandage 2) или номерами.
 # ================================================
 
 import random
@@ -75,8 +75,7 @@ print(f"Критический урон: {crit_damage:.1f}")
 print(f"Масло в лампе: {lamp_oil}")
 print()
 
-# --- Главный цикл игры ----------------------------
-# --- Враги и журнал боя ---------------------------
+# --- Враги, журнал боя, лавка и рюкзак ------------
 enemies = ["крыса-мутант", "шахтёр-призрак", "угольный голем", "летучая мышь"]
 log = []
 enemy_stats = {
@@ -89,6 +88,27 @@ gold_total = 0
 inventory = {}
 prices = {"bandage": 10, "lamp_oil": 15, "pickaxe": 40}
 ability_bonus = 0
+
+# --- Команды и меню -------------------------------
+num_to_verb = {"1": "look", "2": "go", "3": "rest", "4": "knock",
+               "5": "lamp", "6": "train", "7": "descend", "8": "leaders",
+               "9": "shop", "10": "backpack", "11": "bandage", "0": "exit"}
+commands = ["look", "go", "rest", "knock", "lamp", "train", "descend",
+            "leaders", "shop", "backpack", "bandage",
+            "buy <товар> [количество]", "help", "exit"]
+MENU = ["Что делаешь? (номер или команда, help - справка)",
+        "1 - осмотреться (look)",
+        "2 - идти вперёд (go)",
+        "3 - отдохнуть (rest)",
+        "4 - постучать по стене (knock)",
+        "5 - зажечь шахтёрскую лампу (lamp)",
+        "6 - тренировка (train)",
+        "7 - спуститься глубже (descend)",
+        "8 - таблица лидеров (leaders)",
+        "9 - лавка старого шахтёра (shop)",
+        "10 - рюкзак (backpack)",
+        "11 - перевязать раны (bandage)",
+        "0 - подняться на поверхность (exit)"]
 
 
 # --- Функции игры ---------------------------------
@@ -178,45 +198,32 @@ def print_run_summary(log):
         print("В этом забеге боёв не было.")
 
 
+# --- Главный цикл игры ----------------------------
 running = True
-menu_last = 11
 outcome = "прерывание"
 actions = 0
 try:
     while running:
-        print("Что делаешь?")
-        print("1 - осмотреться")
-        print("2 - идти вперёд")
-        print("3 - отдохнуть")
-        print("4 - постучать по стене")
-        print("5 - зажечь шахтёрскую лампу")
-        print("6 - тренировка")
-        print("7 - спуститься глубже")
-        print("8 - таблица лидеров")
-        print("9 - лавка старого шахтёра")
-        print("10 - рюкзак")
-        print("11 - перевязать раны")
-        print("0 - подняться на поверхность")
+        print("\n".join(MENU))
 
-        # --- Проверка пункта меню ---------------------
-        while True:
-            choice = input()
-            try:
-                menu_number = int(choice)
-            except ValueError:
-                print("Нет такого пункта. Введи номер из меню (0-11).")
-                continue
-            if 0 <= menu_number <= menu_last:
-                choice = str(menu_number)
-                break
-            print("Нет такого пункта. Введи номер из меню (0-11).")
+        # --- Чтение и разбор команды -----------------
+        line = input()
+        cmd = line.strip().lower()
+        while cmd == "":
+            print("Пустая команда. Введи команду или номер пункта.")
+            line = input()
+            cmd = line.strip().lower()
+        words = cmd.split()
+        verb = words[0]
+        if cmd in num_to_verb:
+            verb = num_to_verb[cmd]
 
         # --- Выбор действия ----------------------------
-        match choice:
-            case "1":
+        match verb:
+            case "look":
                 print("Ты осмотрелся. Ржавые рельсы уходят в темноту, рядом стоит перевёрнутая вагонетка.")
 
-            case "2":
+            case "go":
                 cost = 2
                 if lamp_oil >= cost:
                     lamp_oil -= cost
@@ -226,16 +233,16 @@ try:
                     lamp_oil = 0
                     print("Лампа погасла. Ты идёшь на ощупь и ударяешься о балки.")
 
-            case "3":
+            case "rest":
                 # отдых даёт меньше, чем забирает дорога, и не больше полного запаса
                 lamp_oil = min(lamp_oil + 1, max_oil)
                 print("Ты присел на ящик из-под динамита и немного отдохнул.")
 
-            case "4":
+            case "knock":
                 luck = luck + 1
                 print("Ты стучишь по стене. В одном месте звук глухой: там пустота! Удача на твоей стороне.")
 
-            case "5":
+            case "lamp":
                 if lamp_oil >= 1:
                     lamp_oil -= 1
                     health = health + 5
@@ -243,7 +250,7 @@ try:
                 else:
                     print("Масла не осталось, лампа не зажигается.")
 
-            case "6":
+            case "train":
                 strikes = 6
                 total_damage = 0
                 crit_count = 0
@@ -271,7 +278,7 @@ try:
                 print(f"Общий урон: {total_damage:.1f}")
                 print(f"Средний урон: {total_damage / strikes:.1f}")
 
-            case "7":
+            case "descend":
                 if not enemies:
                     print("Ты спускаешься ниже, но шахта пуста: врагов больше нет.")
                 else:
@@ -287,51 +294,43 @@ try:
                     print(f"Бой длился раундов: {len(rounds)}.")
                     print(f"Последний раунд: урон героя {log[-1][1]:.1f}, урон врага {log[-1][2]}.")
 
-            case "8":
+            case "leaders":
                 print_leaderboard(log)
 
-            case "9":
+            case "shop":
                 print("Лавка старого шахтёра:")
                 print("(bandage - бинты +10 здоровья, lamp_oil - масло +5, pickaxe - кирка +2 к урону)")
                 for name, price in prices.items():
                     print(f"{name}: {price} золота")
-                print("Название товара (пустая строка - ничего не покупать):")
-                name = input().strip()
-                if name != "":
-                    if name in prices:
-                        price = prices[name]
-                        print("Сколько штук (Enter - одна):")
-                        while True:
-                            qty_line = input()
-                            if qty_line == "":
-                                break
-                            try:
-                                if int(qty_line) > 0:
-                                    break
-                            except ValueError:
-                                pass
-                            print("Нужно целое число больше нуля или просто Enter:")
-                        if qty_line == "":
-                            qty = 1
-                            gold_total, ok = buy(price, gold_total)
-                        else:
-                            qty = int(qty_line)
-                            gold_total, ok = buy(price, gold_total, quantity=qty)
-                        if ok:
-                            if name == "lamp_oil":
-                                # масло сразу заливаем в лампу
-                                lamp_oil = min(lamp_oil + 5 * qty, max_oil)
-                            else:
-                                if name == "pickaxe":
-                                    ability_bonus += 2 * qty
-                                inventory[name] = inventory.get(name, 0) + qty
-                            print(f"Куплено: {name} x{qty} за {price * qty} золота. Осталось золота: {gold_total}.")
-                        else:
-                            print(f"Не хватает золота: нужно {price * qty}, есть {gold_total}.")
-                    else:
-                        print("Такого товара в лавке нет.")
+                print("Купить: buy <товар> [количество], например buy bandage 2")
 
-            case "10":
+            case "buy":
+                if len(words) > 1 and words[-1].isdigit():
+                    qty = int(words[-1])
+                    item = " ".join(words[1:-1])
+                else:
+                    qty = 1
+                    item = " ".join(words[1:])
+                if item == "":
+                    print("Что купить? Напиши: buy <товар>.")
+                    continue
+                if item not in prices or qty < 1:
+                    print("Такого товара в лавке нет.")
+                    continue
+                gold_total, ok = buy(prices[item], gold_total, quantity=qty)
+                if ok:
+                    if item == "lamp_oil":
+                        # масло сразу заливаем в лампу
+                        lamp_oil = min(lamp_oil + 5 * qty, max_oil)
+                    else:
+                        if item == "pickaxe":
+                            ability_bonus += 2 * qty
+                        inventory[item] = inventory.get(item, 0) + qty
+                    print(f"Куплено: {item} x{qty} за {prices[item] * qty} золота. Осталось золота: {gold_total}.")
+                else:
+                    print(f"Не хватает золота: нужно {prices[item] * qty}, есть {gold_total}.")
+
+            case "backpack":
                 if not inventory:
                     print("Рюкзак пуст.")
                 else:
@@ -339,7 +338,7 @@ try:
                     for name, qty in inventory.items():
                         print(f"{name}: {qty} шт.")
 
-            case "11":
+            case "bandage":
                 if inventory.get("bandage", 0) == 0:
                     print("В рюкзаке нет бинтов.")
                 else:
@@ -349,17 +348,26 @@ try:
                         del inventory["bandage"]
                     print(f"Ты перевязал раны. Здоровье: {health}. Бинтов осталось: {inventory.get('bandage', 0)}.")
 
-            case "0":
+            case "help":
+                print("Команды: " + ", ".join(commands) + ".")
+                print("Номера 0-11 работают как раньше.")
+
+            case "exit":
                 print("Ты поднимаешься по лестнице к солнцу. Шахта остаётся внизу.")
                 outcome = "выход"
                 running = False
+
+            case _:
+                print(f"Не понимаю команду: '{line.strip()}'. Напиши 'help'.")
+                continue
 
         if running:
             actions += 1
 
         # --- Состояние героя ---------------------------
         print()
-        print(f"Здоровье: {health:4d}   Масло в лампе: {lamp_oil:3d}   Удача: {luck:3d}   Врагов: {len(enemies)}   Золото: {gold_total}")
+        print(f"Здоровье: {health:4d}   Масло в лампе: {lamp_oil:3d}   Удача: {luck:3d}   "
+              f"Врагов: {len(enemies)}   Золото: {gold_total}")
         print()
 
         # --- Проверка гибели ---------------------------
