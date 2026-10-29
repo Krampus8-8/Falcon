@@ -10,6 +10,8 @@
 # идти опасно: недостающее масло забирает здоровье.
 # ================================================
 
+import random
+
 # --- Заголовок ------------------------------------
 title = "ЗАБРОШЕННАЯ ШАХТА"
 frame = "=" * 23
@@ -71,8 +73,12 @@ print(f"Масло в лампе: {lamp_oil}")
 print()
 
 # --- Главный цикл игры ----------------------------
+# --- Враги и журнал боя ---------------------------
+enemies = ["крыса-мутант", "шахтёр-призрак", "угольный голем", "летучая мышь"]
+log = []
+
 running = True
-menu_last = 6
+menu_last = 7
 outcome = "прерывание"
 actions = 0
 try:
@@ -84,6 +90,7 @@ try:
         print("4 - постучать по стене")
         print("5 - зажечь шахтёрскую лампу")
         print("6 - тренировка")
+        print("7 - спуститься глубже")
         print("0 - подняться на поверхность")
 
         # --- Проверка пункта меню ---------------------
@@ -92,12 +99,12 @@ try:
             try:
                 menu_number = int(choice)
             except ValueError:
-                print("Нет такого пункта. Введи номер из меню (0-6).")
+                print("Нет такого пункта. Введи номер из меню (0-7).")
                 continue
             if 0 <= menu_number <= menu_last:
                 choice = str(menu_number)
                 break
-            print("Нет такого пункта. Введи номер из меню (0-6).")
+            print("Нет такого пункта. Введи номер из меню (0-7).")
 
         # --- Выбор действия ----------------------------
         match choice:
@@ -160,6 +167,39 @@ try:
                 print(f"Общий урон: {total_damage:.1f}")
                 print(f"Средний урон: {total_damage / strikes:.1f}")
 
+            case "7":
+                if not enemies:
+                    print("Ты спускаешься ниже, но шахта пуста: врагов больше нет.")
+                else:
+                    enemy = random.choice(enemies)
+                    enemy_hp = 45
+                    round_n = 0
+                    print(f"Ты спускаешься по ржавой лестнице. Из темноты выходит {enemy}!")
+                    while enemy_hp > 0 and health > 0:
+                        round_n += 1
+                        if round_n % 3 == 0:
+                            hit = crit_damage
+                        else:
+                            hit = damage
+                        enemy_hp -= hit
+                        if enemy_hp <= 0:
+                            if round_n % 3 == 0:
+                                print(f"Раунд {round_n}: ты наносишь {hit:.1f} - критический! Враг падает.")
+                            else:
+                                print(f"Раунд {round_n}: ты наносишь {hit:.1f}. Враг падает.")
+                            log.append(f"раунд {round_n}: герой -{hit:.1f}, {enemy} -0")
+                        else:
+                            enemy_hit = random.randint(2, 6)
+                            health -= enemy_hit
+                            print(f"Раунд {round_n}: ты наносишь {hit:.1f}. У врага осталось {enemy_hp:.1f}. "
+                                  f"Ответный удар: {enemy_hit}.")
+                            log.append(f"раунд {round_n}: герой -{hit:.1f}, {enemy} -{enemy_hit}")
+                    if enemy_hp <= 0:
+                        enemies.remove(enemy)
+                        print(f"Враг {enemy} побеждён! В шахте осталось врагов: {len(enemies)}.")
+                    print(f"Бой длился раундов: {round_n}.")
+                    print("Последняя запись журнала:", log[-1])
+
             case "0":
                 print("Ты поднимаешься по лестнице к солнцу. Шахта остаётся внизу.")
                 outcome = "выход"
@@ -170,7 +210,7 @@ try:
 
         # --- Состояние героя ---------------------------
         print()
-        print(f"Здоровье: {health:4d}   Масло в лампе: {lamp_oil:3d}   Удача: {luck:3d}")
+        print(f"Здоровье: {health:4d}   Масло в лампе: {lamp_oil:3d}   Удача: {luck:3d}   Врагов: {len(enemies)}")
         print()
 
         # --- Проверка гибели ---------------------------
