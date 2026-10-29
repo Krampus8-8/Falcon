@@ -21,10 +21,13 @@ while True:
     print("--- Разбираем вместе ---")
     print("2  - File2  (Записать N первых чётных чисел)")
     print("5  - File5  (Количество элементов файла)")
+    print("6  - File6  (K-й элемент файла)")
+    print("7  - File7  (Первый, второй, предпоследний, последний)")
     print("--- Делаем сами ---")
     print("1  - File1  [СЛОЖНОЕ] (Допустимое ли имя файла)")
     print("3  - File3  (10 членов арифметической прогрессии)")
     print("4  - File4  (Сколько из четырёх файлов существует)")
+    print("8  - File8  (Первый и последний элемент в новый файл)")
     print("0  - Выход")
     print("=" * 60)
 
@@ -81,6 +84,30 @@ while True:
                     if line.strip():
                         count += 1
             print(count)
+
+    elif choice == "6":
+        # File6. K-й элемент файла (с 1), -1 если его нет.
+        name = input("Имя файла: ")
+        k = int(input("K: "))
+        nums = read_ints(name)
+        if 1 <= k <= len(nums):
+            print(nums[k - 1])
+        else:
+            print(-1)
+
+    elif choice == "7":
+        # File7. Первый, второй, предпоследний и последний элементы.
+        name = input("Имя файла (не меньше 4 чисел): ")
+        nums = read_ints(name)
+        print(nums[0], nums[1], nums[-2], nums[-1])
+
+    elif choice == "8":
+        # File8. Первый и последний элементы первого файла записать во второй.
+        first = input("Существующий файл: ")
+        second = input("Новый файл: ")
+        nums = read_ints(first)
+        write_ints(second, [nums[0], nums[-1]])
+        print(f"Файл {second} создан.")
 
     else:
         print("Неверный ввод! Выберите номер из списка.")
