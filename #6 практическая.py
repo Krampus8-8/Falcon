@@ -18,6 +18,9 @@ while True:
     print("11 - Err11 (Две ошибки одним кортежем)")
     print("12 - Err12 [СЛОЖНОЕ] (Текст и тип исключения)")
     print("--- Повторение с защитой ---")
+    print("21 - Begin8 protect  (Среднее арифметическое)")
+    print("22 - If3 protect     (Положительное +1, отрицательное -2, ноль -> 10)")
+    print("23 - While11 protect (Наименьшее K, где 1+2+...+K >= N)")
     print("0  - Выход")
     print("=" * 60)
 
@@ -159,6 +162,46 @@ while True:
             print(type(e))
         else:
             print(number)
+
+    elif choice == "21":
+        # Begin8 protect. Среднее арифметическое с защитой ввода.
+        try:
+            a = float(input("Число a: "))
+            b = float(input("Число b: "))
+        except ValueError:
+            print("Ошибка ввода")
+        else:
+            print((a + b) / 2)
+
+    elif choice == "22":
+        # If3 protect. Ветки прежние, нечисловой ввод: "Ошибка ввода".
+        try:
+            number = int(input("Целое число: "))
+        except ValueError:
+            print("Ошибка ввода")
+        else:
+            if number > 0:
+                number += 1
+            elif number < 0:
+                number -= 2
+            else:
+                number = 10
+            print(number)
+
+    elif choice == "23":
+        # While11 protect. Защищено чтение N, цикл без изменений.
+        try:
+            n = int(input("N (> 1): "))
+        except ValueError:
+            print("Ошибка ввода")
+        else:
+            k = 0
+            total = 0
+            while total < n:
+                k += 1
+                total += k
+            print("K =", k)
+            print("Сумма =", total)
 
     else:
         print("Неверный ввод! Выберите номер из списка.")
