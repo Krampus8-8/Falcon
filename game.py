@@ -14,6 +14,8 @@
 
 import random
 
+import dungeon
+
 # --- Заголовок ------------------------------------
 title = "ЗАБРОШЕННАЯ ШАХТА"
 frame = "=" * 23
@@ -75,18 +77,12 @@ print(f"Критический урон: {crit_damage:.1f}")
 print(f"Масло в лампе: {lamp_oil}")
 print()
 
-# --- Враги, журнал боя, лавка и рюкзак ------------
+# --- Враги, журнал боя и рюкзак -------------------
+# цены лавки и карточки врагов живут в dungeon.py
 enemies = ["крыса-мутант", "шахтёр-призрак", "угольный голем", "летучая мышь"]
 log = []
-enemy_stats = {
-    "крыса-мутант": {"hp": 30, "damage": 4, "loot": 15},
-    "шахтёр-призрак": {"hp": 45, "damage": 6, "loot": 25},
-    "угольный голем": {"hp": 60, "damage": 7, "loot": 35},
-    "летучая мышь": {"hp": 15, "damage": 2, "loot": 5},
-}
 gold_total = 0
 inventory = {}
-prices = {"bandage": 10, "lamp_oil": 15, "pickaxe": 40}
 ability_bonus = 0
 
 # --- Карта шахты ----------------------------------
@@ -134,64 +130,6 @@ MENU = ["Что делаешь? (номер или команда, help - спр
 
 
 # --- Функции игры ---------------------------------
-def hero_hit(strike_n):
-    """Урон героя в удар номер strike_n.
-    Возвращает пару (hit, crit): урон и признак критического удара.
-    Читает глобальные правила damage и crit_damage, ничего не меняет.
-    """
-    if strike_n % 3 == 0:
-        return crit_damage, True
-    return damage, False
-
-
-def fight(enemy, hero_health, bonus=0):
-    """Бой с enemy до гибели одного из двоих.
-    bonus - надбавка к урону героя, по умолчанию 0. Прибавляется
-    после удвоения критом, то есть крит не удваивает надбавку.
-    Карточка врага берётся из enemy_stats по имени, в ней нужны ключи
-    hp, damage и loot. Печатает строки раундов.
-    Возвращает (rounds, won, hero_health, loot):
-    таблицу раундов, признак победы, здоровье после боя и золото.
-    Глобальные переменные не меняет.
-    """
-    stats = enemy_stats[enemy]
-    enemy_hp = float(stats["hp"])
-    rounds = []
-    round_n = 0
-    print(f"Ты спускаешься по ржавой лестнице. Из темноты выходит {enemy}!")
-    while enemy_hp > 0 and hero_health > 0:
-        round_n += 1
-        hit, crit = hero_hit(round_n)
-        hit = hit + bonus
-        enemy_hp -= hit
-        line = f"Раунд {round_n}: ты наносишь {hit:.1f}"
-        if crit:
-            line += " - критический!"
-        if enemy_hp <= 0:
-            line += " Враг падает." if crit else ". Враг падает."
-            rounds.append([round_n, hit, 0])
-        else:
-            enemy_hit = stats["damage"]
-            hero_health -= enemy_hit
-            line += f". У врага осталось {enemy_hp:.1f}. Ответный удар: {enemy_hit}."
-            rounds.append([round_n, hit, enemy_hit])
-        print(line)
-    won = enemy_hp <= 0
-    loot = stats["loot"] if won else 0
-    return rounds, won, hero_health, loot
-
-
-def buy(price, gold, quantity=1):
-    """Покупает quantity штук товара ценой price за золото gold.
-    quantity по умолчанию 1. Возвращает (gold_left, ok): остаток
-    золота и признак успешной покупки. Ничего не печатает.
-    """
-    cost = price * quantity
-    if gold >= cost:
-        return gold - cost, True
-    return gold, False
-
-
 def print_leaderboard(log):
     """Печатает топ-3 раундов по урону героя и самый сильный удар врага.
     Возвращает None: задача функции - печать, а не данные.
@@ -310,7 +248,7 @@ try:
                 print()
                 print(f"Наносишь {strikes} ударов.")
                 for i in range(1, strikes + 1):
-                    hit_damage, crit = hero_hit(i)
+                    hit_damage, crit = dungeon.hero_hit(i, damage, crit_damage)
                     if crit:
                         crit_count += 1
                         print(f"Удар {i}: {hit_damage:.1f} - критический!")
@@ -334,7 +272,7 @@ try:
                     print("Ты спускаешься ниже, но шахта пуста: врагов больше нет.")
                 else:
                     enemy = random.choice(enemies)
-                    rounds, won, health, loot = fight(enemy, health, bonus=ability_bonus)
+                    rounds, won, health, loot = dungeon.fight(enemy, health, ability_bonus, damage, crit_damage)
                     for r in rounds:
                         log.append(r)
                     if won:
@@ -351,7 +289,7 @@ try:
             case "shop":
                 print("Лавка старого шахтёра:")
                 print("(bandage - бинты +10 здоровья, lamp_oil - масло +5, pickaxe - кирка +2 к урону)")
-                for name, price in prices.items():
+                for name, price in dungeon.prices.items():
                     print(f"{name}: {price} золота")
                 print("Купить: buy <товар> [количество], например buy bandage 2")
 
@@ -365,10 +303,10 @@ try:
                 if item == "":
                     print("Что купить? Напиши: buy <товар>.")
                     continue
-                if item not in prices or qty < 1:
+                if item not in dungeon.prices or qty < 1:
                     print("Такого товара в лавке нет.")
                     continue
-                gold_total, ok = buy(prices[item], gold_total, quantity=qty)
+                gold_total, ok = dungeon.buy(dungeon.prices[item], gold_total, quantity=qty)
                 if ok:
                     if item == "lamp_oil":
                         # масло сразу заливаем в лампу
@@ -377,9 +315,9 @@ try:
                         if item == "pickaxe":
                             ability_bonus += 2 * qty
                         inventory[item] = inventory.get(item, 0) + qty
-                    print(f"Куплено: {item} x{qty} за {prices[item] * qty} золота. Осталось золота: {gold_total}.")
+                    print(f"Куплено: {item} x{qty} за {dungeon.prices[item] * qty} золота. Осталось золота: {gold_total}.")
                 else:
-                    print(f"Не хватает золота: нужно {prices[item] * qty}, есть {gold_total}.")
+                    print(f"Не хватает золота: нужно {dungeon.prices[item] * qty}, есть {gold_total}.")
 
             case "backpack":
                 if not inventory:
