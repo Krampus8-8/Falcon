@@ -104,6 +104,7 @@ while True:
     print("3  - Proc3  (Два средних для пар)")
     print("6  - Proc6  (Количество и сумма цифр)")
     print("10 - Proc10 (Обмен пар значений)")
+    print("12 - Proc12 (Тройка по возрастанию)")
     print("--- Делаем сами ---")
     print("2  - Proc2  (Степени 2, 3, 4)")
     print("4  - Proc4  (Равносторонний треугольник)")
@@ -111,6 +112,10 @@ while True:
     print("7  - Proc7  [HARD] (Перевернуть цифры)")
     print("8  - Proc8  (Приписать цифру справа)")
     print("9  - Proc9  (Приписать цифру слева)")
+    print("11 - Proc11 [HARD] (Минимум и максимум четырёх чисел)")
+    print("13 - Proc13 (Тройка по убыванию)")
+    print("14 - Proc14 [HARD] (Правый циклический сдвиг)")
+    print("15 - Proc15 (Левый циклический сдвиг)")
     print("0  - Выход")
     print("=" * 60)
 
@@ -203,6 +208,50 @@ while True:
         print(b)
         print(c)
         print(d)
+
+    elif choice == "11":
+        a = float(input("A: "))
+        b = float(input("B: "))
+        c = float(input("C: "))
+        d = float(input("D: "))
+        min_ab, max_ab = minmax(a, b)
+        min_cd, max_cd = minmax(c, d)
+        minimum, _ = minmax(min_ab, min_cd)
+        _, maximum = minmax(max_ab, max_cd)
+        print("Минимум:", minimum)
+        print("Максимум:", maximum)
+
+    elif choice == "12":
+        for i in range(2):
+            a = float(input(f"Набор {i + 1}, a: "))
+            b = float(input(f"Набор {i + 1}, b: "))
+            c = float(input(f"Набор {i + 1}, c: "))
+            a, b, c = sort_inc3(a, b, c)
+            print(a, b, c)
+
+    elif choice == "13":
+        for i in range(2):
+            a = float(input(f"Набор {i + 1}, a: "))
+            b = float(input(f"Набор {i + 1}, b: "))
+            c = float(input(f"Набор {i + 1}, c: "))
+            a, b, c = sort_dec3(a, b, c)
+            print(a, b, c)
+
+    elif choice == "14":
+        for i in range(2):
+            a = float(input(f"Набор {i + 1}, a: "))
+            b = float(input(f"Набор {i + 1}, b: "))
+            c = float(input(f"Набор {i + 1}, c: "))
+            a, b, c = shift_right3(a, b, c)
+            print(a, b, c)
+
+    elif choice == "15":
+        for i in range(2):
+            a = float(input(f"Набор {i + 1}, a: "))
+            b = float(input(f"Набор {i + 1}, b: "))
+            c = float(input(f"Набор {i + 1}, c: "))
+            a, b, c = shift_left3(a, b, c)
+            print(a, b, c)
 
     else:
         print("Неверный ввод! Выберите номер из списка.")
