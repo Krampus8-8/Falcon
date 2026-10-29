@@ -102,10 +102,15 @@ while True:
     print("--- Разбираем вместе ---")
     print("1  - Proc1  (Третья степень пяти чисел)")
     print("3  - Proc3  (Два средних для пар)")
+    print("6  - Proc6  (Количество и сумма цифр)")
+    print("10 - Proc10 (Обмен пар значений)")
     print("--- Делаем сами ---")
     print("2  - Proc2  (Степени 2, 3, 4)")
     print("4  - Proc4  (Равносторонний треугольник)")
     print("5  - Proc5  (Прямоугольник по вершинам)")
+    print("7  - Proc7  [HARD] (Перевернуть цифры)")
+    print("8  - Proc8  (Приписать цифру справа)")
+    print("9  - Proc9  (Приписать цифру слева)")
     print("0  - Выход")
     print("=" * 60)
 
@@ -155,6 +160,49 @@ while True:
             perimeter, area = rect_ps(x1, y1, x2, y2)
             print(perimeter)
             print(area)
+
+    elif choice == "6":
+        for i in range(5):
+            k = int(input(f"Число {i + 1}: "))
+            count, total = digit_count_sum(k)
+            print(count)
+            print(total)
+
+    elif choice == "7":
+        for i in range(5):
+            k = int(input(f"Число {i + 1}: "))
+            print(invert_digits(k))
+
+    elif choice == "8":
+        k = int(input("K: "))
+        d1 = int(input("D1: "))
+        d2 = int(input("D2: "))
+        k = add_right_digit(d1, k)
+        print(k)
+        k = add_right_digit(d2, k)
+        print(k)
+
+    elif choice == "9":
+        k = int(input("K: "))
+        d1 = int(input("D1: "))
+        d2 = int(input("D2: "))
+        k = add_left_digit(d1, k)
+        print(k)
+        k = add_left_digit(d2, k)
+        print(k)
+
+    elif choice == "10":
+        a = float(input("A: "))
+        b = float(input("B: "))
+        c = float(input("C: "))
+        d = float(input("D: "))
+        a, b = swap(a, b)
+        c, d = swap(c, d)
+        b, c = swap(b, c)
+        print(a)
+        print(b)
+        print(c)
+        print(d)
 
     else:
         print("Неверный ввод! Выберите номер из списка.")
