@@ -15,6 +15,13 @@ while True:
     print("26 - Begin26 (Функция y = 4(x-3)^6 - 7(x-3)^3 + 2)")
     print("27 - Begin27 [СЛОЖНОЕ] (A^8 тремя умножениями)")
     print("28 - Begin28 [СЛОЖНОЕ] (A^15 пятью умножениями)")
+    print("30 - Begin30 (Радианы в градусы)")
+    print("31 - Begin31 (Фаренгейт в Цельсий)")
+    print("32 - Begin32 (Цельсий в Фаренгейт)")
+    print("33 - Begin33 (Цена 1 кг и Y кг конфет)")
+    print("34 - Begin34 [СЛОЖНОЕ] (Шоколадные конфеты и ириски)")
+    print("35 - Begin35 [СЛОЖНОЕ] (Путь лодки)")
+    print("36 - Begin36 [СЛОЖНОЕ] (Расстояние между автомобилями)")
     print("0  - Выход")
     print("=" * 60)
 
@@ -102,6 +109,65 @@ while True:
         degrees = float(input("Угол в градусах: "))
         radians = degrees * PI / 180
         print("В радианах:", radians)
+
+    elif choice == "30":
+        # Begin30. Угол в радианах (0 < a < 2pi) перевести в градусы.
+        radians = float(input("Угол в радианах: "))
+        degrees = radians * 180 / PI
+        print("В градусах:", degrees)
+
+    elif choice == "31":
+        # Begin31. TC = (TF - 32) * 5 / 9
+        fahrenheit = float(input("Температура по Фаренгейту: "))
+        celsius = (fahrenheit - 32) * 5 / 9
+        print("По Цельсию:", celsius)
+
+    elif choice == "32":
+        # Begin32. Из TC = (TF - 32) * 5 / 9 следует TF = TC * 9 / 5 + 32
+        celsius = float(input("Температура по Цельсию: "))
+        fahrenheit = celsius * 9 / 5 + 32
+        print("По Фаренгейту:", fahrenheit)
+
+    elif choice == "33":
+        # Begin33. X кг конфет стоят A рублей. Цена 1 кг и Y кг.
+        weight_x = float(input("X (кг): "))
+        price_a = float(input("A (руб.): "))
+        weight_y = float(input("Y (кг): "))
+        price_one = price_a / weight_x
+        price_y = price_one * weight_y
+        print("1 кг стоит:", price_one)
+        print("Y кг стоит:", price_y)
+
+    elif choice == "34":
+        # Begin34. X кг шоколадных стоят A руб, Y кг ирисок стоят B руб.
+        weight_x = float(input("X (кг шоколадных): "))
+        price_a = float(input("A (руб.): "))
+        weight_y = float(input("Y (кг ирисок): "))
+        price_b = float(input("B (руб.): "))
+        chocolate_kg = price_a / weight_x
+        toffee_kg = price_b / weight_y
+        ratio = chocolate_kg / toffee_kg
+        print("1 кг шоколадных конфет:", chocolate_kg)
+        print("1 кг ирисок:", toffee_kg)
+        print("Шоколадные дороже в", ratio, "раз")
+
+    elif choice == "35":
+        # Begin35. Путь лодки: по озеру V*T1, против течения (V - U)*T2.
+        speed_v = float(input("Скорость лодки V (км/ч): "))
+        speed_u = float(input("Скорость течения U (км/ч): "))
+        time_lake = float(input("Время по озеру T1 (ч): "))
+        time_river = float(input("Время против течения T2 (ч): "))
+        path = speed_v * time_lake + (speed_v - speed_u) * time_river
+        print("Путь S =", path)
+
+    elif choice == "36":
+        # Begin36. Автомобили удаляются: S + (V1 + V2) * T
+        speed1 = float(input("V1 (км/ч): "))
+        speed2 = float(input("V2 (км/ч): "))
+        start_distance = float(input("Начальное расстояние S (км): "))
+        hours = float(input("Время T (ч): "))
+        new_distance = start_distance + (speed1 + speed2) * hours
+        print("Расстояние через T часов:", new_distance)
 
     else:
         print("Неверный ввод! Выберите номер из списка.")
