@@ -24,9 +24,14 @@ while True:
     print("16 - List16 (Сумма, минимум и максимум)")
     print("18 - List18 (Сортировка на месте по убыванию)")
     print("20 - List20 (Генератор квадратов)")
+    print("24 - List24 (Строки по длине и самая длинная)")
     print("--- Делаем сами ---")
     print("17 - List17 (По возрастанию без изменения оригинала)")
     print("19 - List19 (Строки по длине и самая длинная через max)")
+    print("21 - List21 (Только положительные и их количество)")
+    print("22 - List22 (Умножить на D и посчитать равные D)")
+    print("23 - List23 (По убыванию модуля)")
+    print("25 - List25 [HARD] (Второй по величине)")
     print("0  - Выход")
     print("=" * 60)
 
@@ -68,6 +73,38 @@ while True:
         squares = [x * x for x in a]
         print(squares)
         print("Сумма квадратов:", sum(squares))
+
+    elif choice == "21":
+        # List21. Генератором с фильтром только положительные и их количество.
+        a = read_numbers()
+        positive = [x for x in a if x > 0]
+        print(positive)
+        print("Количество:", len(positive))
+
+    elif choice == "22":
+        # List22. Элементы, умноженные на D, и количество элементов, равных D.
+        a = read_numbers()
+        d = int(input("D: "))
+        multiplied = [x * d for x in a]
+        equal_count = len([x for x in a if x == d])
+        print(multiplied)
+        print("Равных D:", equal_count)
+
+    elif choice == "23":
+        # List23. По убыванию модуля.
+        a = read_numbers()
+        print(sorted(a, key=abs, reverse=True))
+
+    elif choice == "24":
+        # List24. Строки по возрастанию длины и самая длинная.
+        s = read_strings()
+        print(sorted(s, key=len))
+        print("Самая длинная:", max(s, key=len))
+
+    elif choice == "25":
+        # List25. Второй по величине элемент (числа различные).
+        a = read_numbers()
+        print("Второй по величине:", sorted(a, reverse=True)[1])
 
     else:
         print("Неверный ввод! Выберите номер из списка.")
