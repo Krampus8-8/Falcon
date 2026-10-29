@@ -20,6 +20,7 @@ while True:
     print("4  - Dict4  (Увеличить значение или добавить пару)")
     print("6  - Dict6  (Сумма всех значений)")
     print("10 - Dict10 (Пары «название: цена»)")
+    print("11 - Dict11 (Счётчик слов)")
     print("--- Делаем сами ---")
     print("2  - Dict2  (Значение по ключу через in)")
     print("3  - Dict3  (Значение через get)")
@@ -27,6 +28,10 @@ while True:
     print("7  - Dict7  (Ключ с наибольшим значением)")
     print("8  - Dict8  (Есть ли значение V)")
     print("9  - Dict9  (Слияние словарей через update)")
+    print("12 - Dict12 [СЛОЖНОЕ] (Обращённый словарь)")
+    print("13 - Dict13 [СЛОЖНОЕ] (Склад: стоимость и самый дорогой)")
+    print("14 - Dict14 [СЛОЖНОЕ] (Удалить пары меньше V)")
+    print("15 - Dict15 (Добавить пары без update)")
     print("0  - Выход")
     print("=" * 60)
 
@@ -116,6 +121,69 @@ while True:
         d = read_dict()
         for name, price in d.items():
             print(f"{name}: {price}")
+
+    elif choice == "11":
+        # Dict11. Словарь-счётчик слов.
+        n = int(input("Количество слов N: "))
+        counts = {}
+        for i in range(n):
+            word = input(f"Слово {i + 1}: ")
+            counts[word] = counts.get(word, 0) + 1
+        for word, count in counts.items():
+            print(word, count)
+
+    elif choice == "12":
+        # Dict12. Обращённый словарь: значение -> ключ.
+        d = read_dict()
+        inverted = {}
+        for key, value in d.items():
+            inverted[value] = key
+        for value, key in inverted.items():
+            print(value, key)
+
+    elif choice == "13":
+        # Dict13. Склад: название -> [цена, количество].
+        n = int(input("Количество предметов N: "))
+        stock = {}
+        for i in range(n):
+            name = input(f"Название {i + 1}: ")
+            price = int(input("Цена: "))
+            qty = int(input("Количество: "))
+            stock[name] = [price, qty]
+        total = 0
+        best = None
+        best_cost = -1
+        for name in stock:
+            price, qty = stock[name]
+            cost = price * qty
+            total += cost
+            if cost > best_cost:
+                best_cost = cost
+                best = name
+        print("Стоимость склада:", total)
+        print("Самый дорогой:", best)
+
+    elif choice == "14":
+        # Dict14. Удалить пары со значением меньше V.
+        d = read_dict()
+        v = int(input("Число V: "))
+        for key in list(d):
+            if d[key] < v:
+                del d[key]
+        print(len(d))
+
+    elif choice == "15":
+        # Dict15. Добавить пары второго словаря без update.
+        first = read_dict("первого словаря")
+        second = read_dict("второго словаря")
+        ignored = 0
+        for key, value in second.items():
+            if key in first:
+                ignored += 1
+            else:
+                first[key] = value
+        print(len(first))
+        print("Проигнорировано:", ignored)
 
     else:
         print("Неверный ввод! Выберите номер из списка.")
