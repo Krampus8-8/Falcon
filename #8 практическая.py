@@ -25,6 +25,7 @@ while True:
     print("18 - List18 (Сортировка на месте по убыванию)")
     print("20 - List20 (Генератор квадратов)")
     print("24 - List24 (Строки по длине и самая длинная)")
+    print("27 - List27 (Таблица раундов по урону героя)")
     print("--- Делаем сами ---")
     print("17 - List17 (По возрастанию без изменения оригинала)")
     print("19 - List19 (Строки по длине и самая длинная через max)")
@@ -32,6 +33,10 @@ while True:
     print("22 - List22 (Умножить на D и посчитать равные D)")
     print("23 - List23 (По убыванию модуля)")
     print("25 - List25 [HARD] (Второй по величине)")
+    print("26 - List26 (Элементы больше среднего)")
+    print("28 - List28 (Строки, начинающиеся с буквы)")
+    print("29 - List29 [HARD] (K наибольших по убыванию)")
+    print("30 - List30 (Длины строк и их сумма)")
     print("0  - Выход")
     print("=" * 60)
 
@@ -105,6 +110,45 @@ while True:
         # List25. Второй по величине элемент (числа различные).
         a = read_numbers()
         print("Второй по величине:", sorted(a, reverse=True)[1])
+
+    elif choice == "26":
+        # List26. Элементы больше среднего и само среднее.
+        a = read_numbers()
+        average = sum(a) / len(a)
+        above = [x for x in a if x > average]
+        print(above)
+        print(f"Среднее: {average:.1f}")
+
+    elif choice == "27":
+        # List27. Строки-пары (урон героя, урон врага). По убыванию урона героя и лучшая строка.
+        n = int(input("Количество раундов N: "))
+        rows = []
+        for i in range(n):
+            hero, enemy = input(f"Раунд {i + 1} (урон героя и врага через пробел): ").split()
+            rows.append([float(hero), float(enemy)])
+        ordered = sorted(rows, key=lambda r: r[0], reverse=True)
+        for r in ordered:
+            print(r)
+        print("Лучшая строка:", ordered[0])
+
+    elif choice == "28":
+        # List28. Строки, начинающиеся с заданной буквы.
+        s = read_strings()
+        letter = input("Буква: ")
+        print([w for w in s if w and w[0] == letter])
+
+    elif choice == "29":
+        # List29. K наибольших элементов по убыванию (сортировка и срез).
+        a = read_numbers()
+        k = int(input("K: "))
+        print(sorted(a, reverse=True)[:k])
+
+    elif choice == "30":
+        # List30. Список длин строк и суммарная длина.
+        s = read_strings()
+        lengths = [len(w) for w in s]
+        print(lengths)
+        print("Суммарная длина:", sum(len(w) for w in s))
 
     else:
         print("Неверный ввод! Выберите номер из списка.")
