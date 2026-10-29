@@ -8,6 +8,7 @@ while True:
     print("6  - Boolean6  (A < B < C)")
     print("12 - Boolean12 (Каждое из A, B, C положительное)")
     print("14 - Boolean14 (Ровно одно из A, B, C положительное)")
+    print("23 - If3       (Положительное +1, отрицательное -2, ноль -> 10)")
     print("--- Делаем сами ---")
     print("2  - Boolean2  (A нечётное)")
     print("3  - Boolean3  (A чётное)")
@@ -20,6 +21,10 @@ while True:
     print("11 - Boolean11 (A и B одинаковой чётности)")
     print("13 - Boolean13 (Хотя бы одно из A, B, C положительное)")
     print("15 - Boolean15 [СЛОЖНОЕ] (Ровно два из A, B, C положительные)")
+    print("21 - If1       (Положительное +1, иначе без изменений)")
+    print("22 - If2       (Положительное +1, иначе -2)")
+    print("24 - If4       (Количество положительных из трёх)")
+    print("25 - If5       (Количество положительных и отрицательных)")
     print("0  - Выход")
     print("=" * 60)
 
@@ -124,6 +129,51 @@ while True:
         c = int(input("C: "))
         positive_count = (a > 0) + (b > 0) + (c > 0)
         print(positive_count == 2)
+
+    elif choice == "21":
+        # If1. Положительное: прибавить 1, иначе не изменять.
+        number = int(input("Число: "))
+        if number > 0:
+            number += 1
+        print(number)
+
+    elif choice == "22":
+        # If2. Положительное: прибавить 1, иначе вычесть 2.
+        number = int(input("Число: "))
+        if number > 0:
+            number += 1
+        else:
+            number -= 2
+        print(number)
+
+    elif choice == "23":
+        # If3. Положительное: +1, отрицательное: -2, ноль: заменить на 10.
+        number = int(input("Число: "))
+        if number > 0:
+            number += 1
+        elif number < 0:
+            number -= 2
+        else:
+            number = 10
+        print(number)
+
+    elif choice == "24":
+        # If4. Количество положительных чисел среди трёх.
+        a = int(input("Первое число: "))
+        b = int(input("Второе число: "))
+        c = int(input("Третье число: "))
+        positive_count = (a > 0) + (b > 0) + (c > 0)
+        print("Положительных:", positive_count)
+
+    elif choice == "25":
+        # If5. Количество положительных и отрицательных чисел среди трёх.
+        a = int(input("Первое число: "))
+        b = int(input("Второе число: "))
+        c = int(input("Третье число: "))
+        positive_count = (a > 0) + (b > 0) + (c > 0)
+        negative_count = (a < 0) + (b < 0) + (c < 0)
+        print("Положительных:", positive_count)
+        print("Отрицательных:", negative_count)
 
     else:
         print("Неверный ввод! Выберите номер из списка.")
