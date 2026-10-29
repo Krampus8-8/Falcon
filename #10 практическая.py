@@ -137,6 +137,8 @@ while True:
     print("16 - Proc16 (Sign(A) + Sign(B))")
     print("19 - Proc19 (Площади трёх колец)")
     print("22 - Proc22 (Калькулятор по номеру операции)")
+    print("28 - Proc28 (Простые числа в наборе)")
+    print("30 - Proc30 (n-я цифра числа справа)")
     print("--- Делаем сами ---")
     print("17 - Proc17 (Количество корней уравнения)")
     print("18 - Proc18 (Площади трёх кругов)")
@@ -145,6 +147,9 @@ while True:
     print("23 - Proc23 (Координатная четверть)")
     print("24 - Proc24 (Количество чётных)")
     print("25 - Proc25 (Количество квадратов)")
+    print("26 - Proc26 (Количество степеней пятёрки)")
+    print("27 - Proc27 [СЛОЖНОЕ] (Количество степеней числа N)")
+    print("29 - Proc29 (Количество цифр)")
     print("0  - Выход")
     print("=" * 60)
 
@@ -211,6 +216,31 @@ while True:
     elif choice == "25":
         numbers = read_ten()
         print("Квадратов:", sum(1 for k in numbers if is_square(k)))
+
+    elif choice == "26":
+        numbers = read_ten()
+        print("Степеней пятёрки:", sum(1 for k in numbers if is_power5(k)))
+
+    elif choice == "27":
+        n = int(input("N (> 1): "))
+        numbers = read_ten()
+        print("Степеней N:", sum(1 for k in numbers if is_power_n(k, n)))
+
+    elif choice == "28":
+        numbers = read_ten()
+        print("Простых:", sum(1 for k in numbers if is_prime(k)))
+
+    elif choice == "29":
+        for i in range(5):
+            k = int(input(f"Число {i + 1}: "))
+            print(digit_count(k))
+
+    elif choice == "30":
+        for i in range(5):
+            k = int(input(f"Число {i + 1}: "))
+            for n in range(1, 6):
+                print(digit_n(k, n), end=" ")
+            print()
 
     else:
         print("Неверный ввод! Выберите номер из списка.")
