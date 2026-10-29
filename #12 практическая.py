@@ -7,6 +7,8 @@ while True:
     print("1  - String1  (Код символа)")
     print("6  - String6  (Цифра, латинская или русская буква)")
     print("10 - String10 (Строка наоборот)")
+    print("11 - String11 (Символы через пробел)")
+    print("13 - String13 (Количество цифр)")
     print("--- Делаем сами ---")
     print("2  - String2  (Символ по коду)")
     print("3  - String3  (Соседи символа в таблице)")
@@ -15,6 +17,9 @@ while True:
     print("7  - String7  (Коды первого и последнего символа)")
     print("8  - String8  (Строка из N символов C)")
     print("9  - String9  [СЛОЖНОЕ] (Чередование C1 и C2)")
+    print("12 - String12 (Символы через N звёздочек)")
+    print("14 - String14 (Прописные латинские буквы)")
+    print("15 - String15 [СЛОЖНОЕ] (Строчные латинские и русские буквы)")
     print("0  - Выход")
     print("=" * 60)
 
@@ -81,6 +86,33 @@ while True:
         # String10. Строка в обратном порядке.
         s = input("Строка: ")
         print(s[::-1])
+
+    elif choice == "11":
+        # String11. Символы строки через один пробел.
+        s = input("Строка: ")
+        print(" ".join(s))
+
+    elif choice == "12":
+        # String12. Символы строки через N звёздочек.
+        s = input("Строка: ")
+        n = int(input("N: "))
+        print(("*" * n).join(s))
+
+    elif choice == "13":
+        # String13. Количество цифр в строке.
+        s = input("Строка: ")
+        print(sum(1 for ch in s if "0" <= ch <= "9"))
+
+    elif choice == "14":
+        # String14. Количество прописных латинских букв.
+        s = input("Строка: ")
+        print(sum(1 for ch in s if "A" <= ch <= "Z"))
+
+    elif choice == "15":
+        # String15. Количество строчных латинских и русских букв.
+        s = input("Строка: ")
+        alphabet = "abcdefghijklmnopqrstuvwxyz" + "абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
+        print(sum(1 for ch in s if ch in alphabet))
 
     else:
         print("Неверный ввод! Выберите номер из списка.")
